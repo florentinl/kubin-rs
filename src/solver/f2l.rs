@@ -275,7 +275,7 @@ impl Solver {
             .get(&two_pairs_front_case)
             .unwrap();
         let two_pairs_back_distance = self.two_pairs_back_cases.get(&two_pairs_back_case).unwrap();
-        [
+        *[
             *corner_distance,
             *edge_distance,
             *two_pairs_front_distance,
@@ -284,7 +284,6 @@ impl Solver {
         .iter()
         .max()
         .unwrap()
-        .clone()
     }
 
     pub fn solve(&self, cube: &Cube) -> Vec<Move> {

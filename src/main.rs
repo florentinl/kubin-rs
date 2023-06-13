@@ -1,4 +1,7 @@
-use kubin_rs::{cube::{self, algorithms}, solver, scramble};
+use kubin_rs::{
+    cube::{self},
+    scramble, solver,
+};
 
 /// Repl to run the program interactively
 pub fn main() {
@@ -38,7 +41,7 @@ pub fn main() {
         let pll_solution = pll_solver.solve(&cube);
         cube.execute_algorithm(&pll_solution);
         let elapsed = now.elapsed();
-        // assert_eq!(cube, cube::Cube::default());
+        assert_eq!(cube, cube::Cube::default());
         let solution_length =
             cross_solution.len() + f2l_solution.len() + oll_solution.len() + pll_solution.len();
         total_time += elapsed;

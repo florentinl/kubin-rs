@@ -1,4 +1,4 @@
-use crate::cube::algorithms::{Move, self};
+use crate::cube::algorithms::{self, Move};
 
 pub fn generate_scramble() -> Vec<Move> {
     let mut scramble = Vec::with_capacity(20);

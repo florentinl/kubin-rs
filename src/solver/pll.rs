@@ -189,31 +189,28 @@ impl Solver {
 
     pub fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
-        for u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
-            cube.execute_move(u_move);
+        for pre_u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
+            cube.execute_move(pre_u_move);
             let case = Case::from_cube(&cube);
             if let Some(alg) = self.cases.get(&case) {
-                cube.execute_algorithm(&alg);
-                let mut alg = if !matches!(u_move, Move::None) {
-                    [u_move.clone()].iter().chain(alg.iter()).cloned().collect()
-                } else {
-                    alg.clone()
-                };
-
+                cube.execute_algorithm(alg);
                 // Adjust U face
-                for u_move in [Move::None, Move::U, Move::U2, Move::Up] {
-                    cube.execute_move(&u_move);
+                for post_u_move in [Move::None, Move::U, Move::U2, Move::Up] {
+                    cube.execute_move(&post_u_move);
                     if self.is_solved(&cube) {
-                        if !matches!(u_move, Move::None) {
-                            alg.push(u_move.clone());
-                            return alg;
-                        } else {
-                            return alg;
-                        }
+                        let solution = [pre_u_move.clone()]
+                            .iter()
+                            .chain(alg.iter())
+                            .chain([post_u_move.clone()].iter())
+                            .cloned()
+                            .collect::<Vec<Move>>();
+
+                        return solution;
                     }
+                    cube.execute_move(&invert_move(&post_u_move));
                 }
             }
-            cube.execute_move(&invert_move(u_move));
+            cube.execute_move(&invert_move(pre_u_move));
         }
         vec![]
     }

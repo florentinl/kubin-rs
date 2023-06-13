@@ -145,7 +145,10 @@ pub fn parse_algorithm(algorithm: &str) -> Vec<Move> {
 }
 
 pub fn algorithm_to_string(alg: &[Move]) -> String {
-    alg.iter().map(|m| m.to_string()).collect::<Vec<String>>().join(" ")
+    alg.iter()
+        .map(|m| m.to_string())
+        .collect::<Vec<String>>()
+        .join(" ")
 }
 
 #[cfg(test)]
