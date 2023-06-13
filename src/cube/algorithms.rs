@@ -21,6 +21,32 @@ pub enum Move {
     None,
 }
 
+impl ToString for Move {
+    fn to_string(&self) -> String {
+        match self {
+            Move::U => "U".to_string(),
+            Move::U2 => "U2".to_string(),
+            Move::Up => "U'".to_string(),
+            Move::D => "D".to_string(),
+            Move::D2 => "D2".to_string(),
+            Move::Dp => "D'".to_string(),
+            Move::F => "F".to_string(),
+            Move::F2 => "F2".to_string(),
+            Move::Fp => "F'".to_string(),
+            Move::B => "B".to_string(),
+            Move::B2 => "B2".to_string(),
+            Move::Bp => "B'".to_string(),
+            Move::R => "R".to_string(),
+            Move::R2 => "R2".to_string(),
+            Move::Rp => "R'".to_string(),
+            Move::L => "L".to_string(),
+            Move::L2 => "L2".to_string(),
+            Move::Lp => "L'".to_string(),
+            Move::None => "".to_string(),
+        }
+    }
+}
+
 pub(crate) const ALL_MOVES: [Move; 18] = [
     Move::U,
     Move::U2,
@@ -116,6 +142,10 @@ pub fn parse_algorithm(algorithm: &str) -> Vec<Move> {
         }
     }
     parsed_algorithm
+}
+
+pub fn algorithm_to_string(alg: &[Move]) -> String {
+    alg.iter().map(|m| m.to_string()).collect::<Vec<String>>().join(" ")
 }
 
 #[cfg(test)]

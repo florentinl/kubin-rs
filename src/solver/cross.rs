@@ -101,9 +101,9 @@ impl Solver {
         print_bfs_terminated!("Cross", self.cases.len(), CROSS_CASES);
     }
 
-    pub fn solve(&self, cube: &crate::cube::Cube) -> Option<Vec<Move>> {
+    pub fn solve(&self, cube: &crate::cube::Cube) -> Vec<Move> {
         let case = Case::from_cube(cube);
-        self.cases.get(&case).cloned()
+        self.cases.get(&case).unwrap_or(&Vec::new()).clone()
     }
 }
 
@@ -126,8 +126,6 @@ mod tests {
         cube.execute_algorithm(&scramble);
 
         let solution = solver.solve(&cube);
-        assert!(solution.is_some());
-        let solution = solution.unwrap();
         assert_eq!(solution.len(), 3);
     }
 }
