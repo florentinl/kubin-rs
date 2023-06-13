@@ -1,0 +1,31 @@
+// Macro to print progress of BFS.
+macro_rules! print_bfs_progress {
+    ($name:expr, $current:ident, $total:ident) => {
+        if $current % 1000 == 0 {
+            let icon = match ($current / 1000) % 4 {
+                0 => "◜",
+                1 => "◝",
+                2 => "◞",
+                3 => "◟",
+                _ => unreachable!(),
+            };
+            print!(
+                "Generating {} Lookup Table {}: {} / {}\r",
+                $name, icon, $current, $total
+            );
+            std::io::stdout().flush().unwrap();
+        }
+    };
+}
+pub(crate) use print_bfs_progress;
+
+macro_rules! print_bfs_terminated {
+    ($name:expr, $current:expr, $total:ident) => {
+        println!(
+            "Generating {} Lookup Table ✅: {} / {}",
+            $name, $current, $total
+        );
+    };
+}
+
+pub(crate) use print_bfs_terminated;

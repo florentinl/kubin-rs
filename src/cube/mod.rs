@@ -28,7 +28,7 @@ pub(crate) const DLF: usize = 5;
 pub(crate) const DBL: usize = 6;
 pub(crate) const DRB: usize = 7;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube {
     /// Edges in the following order: UR, UF, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR
     pub(crate) edges: [edge::Edge; 12],
@@ -88,6 +88,7 @@ impl Cube {
             Move::B => self.b(),
             Move::B2 => self.b2(),
             Move::Bp => self.b_prime(),
+            Move::None => (),
         }
     }
 

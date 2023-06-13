@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Move {
     U,
     U2,
@@ -18,6 +18,7 @@ pub enum Move {
     L,
     L2,
     Lp,
+    None,
 }
 
 pub(crate) const ALL_MOVES: [Move; 18] = [
@@ -62,6 +63,7 @@ pub fn invert_move(move_: &Move) -> Move {
         Move::L => Move::Lp,
         Move::L2 => Move::L2,
         Move::Lp => Move::L,
+        Move::None => Move::None,
     }
 }
 

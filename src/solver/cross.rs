@@ -10,11 +10,13 @@ use std::{
 
 const CROSS_CASES: usize = 190_080;
 
-use crate::cube::{
+use crate::{cube::{
     self,
     algorithms::Move,
     edge::{self, Edge},
-};
+}, solver::utils::print_bfs_progress};
+
+use super::utils::print_bfs_terminated;
 
 /// Associate each cross piece with its index in the edges array and its orientation.
 #[derive(PartialEq, Eq, Hash, Debug)]
@@ -49,7 +51,7 @@ impl Case {
 }
 
 pub struct Solver {
-    solutions: HashMap<Case, Vec<Move>>,
+    cases: HashMap<Case, Vec<Move>>,
 }
 
 impl Default for Solver {
@@ -62,26 +64,27 @@ impl Solver {
     #[must_use]
     pub fn new() -> Self {
         let mut cross_solver = Self {
-            solutions: HashMap::with_capacity(CROSS_CASES),
+            cases: HashMap::with_capacity(CROSS_CASES),
         };
-        cross_solver.generate_solutions();
+        cross_solver.generate_cases();
         cross_solver
     }
 
-    fn generate_solutions(&mut self) {
+    fn generate_cases(&mut self) {
         // Using a breadth-first search, generate a lookup table for all possible cross cases.
         let mut queue = VecDeque::with_capacity(CROSS_CASES);
         queue.push_back((cube::Cube::default(), Vec::new()));
 
         while let Some((cube, solution)) = queue.pop_front() {
-            self.print_progress();
+            let progress = self.cases.len();
+            print_bfs_progress!("Cross", progress, CROSS_CASES);
 
             let case = Case::from_cube(&cube);
-            if self.solutions.contains_key(&case) {
+            if self.cases.contains_key(&case) {
                 continue;
             }
 
-            self.solutions
+            self.cases
                 .insert(case, cube::algorithms::invert_algorithm(&solution));
 
             for move_ in cube::algorithms::ALL_MOVES {
@@ -92,36 +95,12 @@ impl Solver {
                 queue.push_back((cube, solution));
             }
         }
-        println!(
-            "Generating Cross Lookup Table ✅: {} / {}",
-            self.solutions.len(),
-            CROSS_CASES
-        );
+        print_bfs_terminated!("Cross", self.cases.len(), CROSS_CASES);
     }
 
-    fn print_progress(&self) {
-        if self.solutions.len() % 1000 == 0 {
-            let icon = match (self.solutions.len() / 1000) % 4 {
-                0 => "◜",
-                1 => "◝",
-                2 => "◞",
-                3 => "◟",
-                _ => unreachable!(),
-            };
-            print!(
-                "Generating Cross Lookup Table {}: {} / {}\r",
-                icon,
-                self.solutions.len(),
-                CROSS_CASES
-            );
-            std::io::stdout().flush().unwrap();
-        }
-    }
-
-    #[must_use]
     pub fn solve(&self, cube: &crate::cube::Cube) -> Option<Vec<Move>> {
         let case = Case::from_cube(cube);
-        self.solutions.get(&case).cloned()
+        self.cases.get(&case).cloned()
     }
 }
 
@@ -132,7 +111,7 @@ mod tests {
     #[test]
     fn generate_solutions() {
         let solver = Solver::new();
-        assert_eq!(solver.solutions.len(), CROSS_CASES);
+        assert_eq!(solver.cases.len(), CROSS_CASES);
     }
 
     #[test]

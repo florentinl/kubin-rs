@@ -1,10 +1,10 @@
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct Edge {
     pub(crate) piece: EdgePiece,
     pub(crate) orientation: usize,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) enum EdgePiece {
     UR,
     UF,

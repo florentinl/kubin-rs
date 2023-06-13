@@ -11,6 +11,14 @@ pub fn main() {
     cube.execute_algorithm(&scramble);
 
     let cross_solver = solver::cross::Solver::new();
-    let cross_solution = cross_solver.solve(&cube);
+    let f2l_solver = solver::f2l::Solver::new();
+
+    let cross_solution = cross_solver.solve(&cube).unwrap();
+    cube.execute_algorithm(&cross_solution);
+
+    let f2l_solution = f2l_solver.solve(&cube);
+    cube.execute_algorithm(&f2l_solution);
+
     println!("Cross solution: {cross_solution:?}");
+    println!("F2L solution: {f2l_solution:?}");
 }
