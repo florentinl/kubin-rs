@@ -5,35 +5,35 @@ pub mod corner;
 pub mod edge;
 
 /// Edges in the following order: UR, UF, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR
-const UR: usize = 0;
-const UF: usize = 1;
-const UL: usize = 2;
-const UB: usize = 3;
-const DR: usize = 4;
-const DF: usize = 5;
-const DL: usize = 6;
-const DB: usize = 7;
-const FR: usize = 8;
-const FL: usize = 9;
-const BL: usize = 10;
-const BR: usize = 11;
+pub(crate) const UR: usize = 0;
+pub(crate) const UF: usize = 1;
+pub(crate) const UL: usize = 2;
+pub(crate) const UB: usize = 3;
+pub(crate) const DR: usize = 4;
+pub(crate) const DF: usize = 5;
+pub(crate) const DL: usize = 6;
+pub(crate) const DB: usize = 7;
+pub(crate) const FR: usize = 8;
+pub(crate) const FL: usize = 9;
+pub(crate) const BL: usize = 10;
+pub(crate) const BR: usize = 11;
 
 /// Corners in the following order: URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB
-const URF: usize = 0;
-const UFL: usize = 1;
-const ULB: usize = 2;
-const UBR: usize = 3;
-const DFR: usize = 4;
-const DLF: usize = 5;
-const DBL: usize = 6;
-const DRB: usize = 7;
+pub(crate) const URF: usize = 0;
+pub(crate) const UFL: usize = 1;
+pub(crate) const ULB: usize = 2;
+pub(crate) const UBR: usize = 3;
+pub(crate) const DFR: usize = 4;
+pub(crate) const DLF: usize = 5;
+pub(crate) const DBL: usize = 6;
+pub(crate) const DRB: usize = 7;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Cube {
     /// Edges in the following order: UR, UF, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR
-    edges: [edge::Edge; 12],
+    pub(crate) edges: [edge::Edge; 12],
     /// Corners in the following order: URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB
-    corners: [corner::Corner; 8],
+    pub(crate) corners: [corner::Corner; 8],
 }
 
 impl Default for Cube {

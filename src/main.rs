@@ -1,19 +1,16 @@
-use std::io::Write;
-
-use kubin_rs::cube;
+use kubin_rs::{cube, solver};
 
 /// Repl to run the program interactively
 pub fn main() {
     let mut cube = cube::Cube::default();
-    let mut input = String::new();
-    loop {
-        print!("Enter an algorithm: ");
-        std::io::stdout().flush().unwrap();
-        input.clear();
-        std::io::stdin().read_line(&mut input).unwrap();
-        let input = input.trim();
-        let algorithm = cube::algorithms::parse_algorithm(input);
-        cube.execute_algorithm(&algorithm);
-        println!("{cube:?}");
-    }
+
+    let scramble = cube::algorithms::parse_algorithm(
+        "B' F L' U2 L2 D' F' B2 R B R' F' U' R2 D2 U B' D' B' R' U2 L R2 F L'",
+    );
+
+    cube.execute_algorithm(&scramble);
+
+    let cross_solver = solver::cross::Solver::new();
+    let cross_solution = cross_solver.solve(&cube);
+    println!("Cross solution: {cross_solution:?}");
 }

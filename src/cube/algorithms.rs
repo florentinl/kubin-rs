@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Move {
     U,
     U2,
@@ -20,7 +20,29 @@ pub enum Move {
     Lp,
 }
 
-#[must_use] pub fn invert_move(move_: &Move) -> Move {
+pub(crate) const ALL_MOVES: [Move; 18] = [
+    Move::U,
+    Move::U2,
+    Move::Up,
+    Move::D,
+    Move::D2,
+    Move::Dp,
+    Move::F,
+    Move::F2,
+    Move::Fp,
+    Move::B,
+    Move::B2,
+    Move::Bp,
+    Move::R,
+    Move::R2,
+    Move::Rp,
+    Move::L,
+    Move::L2,
+    Move::Lp,
+];
+
+#[must_use]
+pub fn invert_move(move_: &Move) -> Move {
     match move_ {
         Move::U => Move::Up,
         Move::U2 => Move::U2,
@@ -43,7 +65,8 @@ pub enum Move {
     }
 }
 
-#[must_use] pub fn invert_algorithm(algorithm: &[Move]) -> Vec<Move> {
+#[must_use]
+pub fn invert_algorithm(algorithm: &[Move]) -> Vec<Move> {
     let mut inverted_algorithm = Vec::with_capacity(algorithm.len());
     for move_ in algorithm.iter().rev() {
         inverted_algorithm.push(invert_move(move_));
@@ -51,53 +74,42 @@ pub enum Move {
     inverted_algorithm
 }
 
-#[must_use] pub fn parse_algorithm(algorithm: &str) -> Vec<Move> {
+#[must_use]
+pub fn parse_algorithm(algorithm: &str) -> Vec<Move> {
     let mut parsed_algorithm = Vec::with_capacity(algorithm.len());
     let mut chars = algorithm.chars();
     while let Some(c) = chars.next() {
         match c {
-            'U' => {
-                match chars.next() {
-                    Some('2') => parsed_algorithm.push(Move::U2),
-                    Some('\'') => parsed_algorithm.push(Move::Up),
-                    _ => parsed_algorithm.push(Move::U),
-                }
-            }
-            'D' => {
-                match chars.next() {
-                    Some('2') => parsed_algorithm.push(Move::D2),
-                    Some('\'') => parsed_algorithm.push(Move::Dp),
-                    _ => parsed_algorithm.push(Move::D),
-                }
-            }
-            'F' => {
-                match chars.next() {
-                    Some('2') => parsed_algorithm.push(Move::F2),
-                    Some('\'') => parsed_algorithm.push(Move::Fp),
-                    _ => parsed_algorithm.push(Move::F),
-                }
-            }
-            'B' => {
-                match chars.next() {
-                    Some('2') => parsed_algorithm.push(Move::B2),
-                    Some('\'') => parsed_algorithm.push(Move::Bp),
-                    _ => parsed_algorithm.push(Move::B),
-                }
-            }
-            'R' => {
-                match chars.next() {
-                    Some('2') => parsed_algorithm.push(Move::R2),
-                    Some('\'') => parsed_algorithm.push(Move::Rp),
-                    _ => parsed_algorithm.push(Move::R),
-                }
-            }
-            'L' => {
-                match chars.next() {
-                    Some('2') => parsed_algorithm.push(Move::L2),
-                    Some('\'') => parsed_algorithm.push(Move::Lp),
-                    _ => parsed_algorithm.push(Move::L),
-                }
-            }
+            'U' => match chars.next() {
+                Some('2') => parsed_algorithm.push(Move::U2),
+                Some('\'') => parsed_algorithm.push(Move::Up),
+                _ => parsed_algorithm.push(Move::U),
+            },
+            'D' => match chars.next() {
+                Some('2') => parsed_algorithm.push(Move::D2),
+                Some('\'') => parsed_algorithm.push(Move::Dp),
+                _ => parsed_algorithm.push(Move::D),
+            },
+            'F' => match chars.next() {
+                Some('2') => parsed_algorithm.push(Move::F2),
+                Some('\'') => parsed_algorithm.push(Move::Fp),
+                _ => parsed_algorithm.push(Move::F),
+            },
+            'B' => match chars.next() {
+                Some('2') => parsed_algorithm.push(Move::B2),
+                Some('\'') => parsed_algorithm.push(Move::Bp),
+                _ => parsed_algorithm.push(Move::B),
+            },
+            'R' => match chars.next() {
+                Some('2') => parsed_algorithm.push(Move::R2),
+                Some('\'') => parsed_algorithm.push(Move::Rp),
+                _ => parsed_algorithm.push(Move::R),
+            },
+            'L' => match chars.next() {
+                Some('2') => parsed_algorithm.push(Move::L2),
+                Some('\'') => parsed_algorithm.push(Move::Lp),
+                _ => parsed_algorithm.push(Move::L),
+            },
             _ => {}
         }
     }
@@ -142,14 +154,7 @@ mod tests {
     fn test_parse_algorithm() {
         assert_eq!(
             parse_algorithm("U2 D' F2 B' R2 L'"),
-            vec![
-                Move::U2,
-                Move::Dp,
-                Move::F2,
-                Move::Bp,
-                Move::R2,
-                Move::Lp
-            ]
+            vec![Move::U2, Move::Dp, Move::F2, Move::Bp, Move::R2, Move::Lp]
         );
     }
 }
