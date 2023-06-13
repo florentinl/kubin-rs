@@ -12,6 +12,7 @@ pub fn main() {
 
     let cross_solver = solver::cross::Solver::new();
     let f2l_solver = solver::f2l::Solver::new();
+    let oll_solver = solver::oll::Solver::new();
 
     let cross_solution = cross_solver.solve(&cube).unwrap();
     cube.execute_algorithm(&cross_solution);
@@ -19,6 +20,10 @@ pub fn main() {
     let f2l_solution = f2l_solver.solve(&cube);
     cube.execute_algorithm(&f2l_solution);
 
+    let oll_solution = oll_solver.solve(&cube);
+    cube.execute_algorithm(&oll_solution);
+
     println!("Cross solution: {cross_solution:?}");
     println!("F2L solution: {f2l_solution:?}");
+    println!("OLL solution: {oll_solution:?}");
 }
