@@ -3,7 +3,7 @@ use kubin_rs::{cube::{self, algorithms}, solver, scramble};
 /// Repl to run the program interactively
 pub fn main() {
     let mut scrambles = vec![];
-    for _ in 0..10 {
+    for _ in 0..100 {
         scrambles.push(scramble::generate_scramble());
     }
 
@@ -52,9 +52,4 @@ pub fn main() {
         "Solved {} scrambles: in {total_time:?} / {total_moves} moves ({average_time:?} / {average_moves} moves per scramble)",
         scrambles.len()
     );
-
-    println!("Here is the list of scrambles:");
-    for scramble in &scrambles {
-        println!("{}", algorithms::algorithm_to_string(scramble));
-    }
 }

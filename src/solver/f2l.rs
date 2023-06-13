@@ -23,6 +23,79 @@ use crate::{
 
 const CORNER_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(3, 4);
 const EDGE_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(2, 4);
+const TWO_PAIRS_CASES: usize = 8 * 7 * 8 * 7 * usize::pow(3, 2) * usize::pow(2, 2);
+
+#[derive(PartialEq, Eq, Hash, Debug)]
+pub struct TwoPairsFrontCase {
+    dfr: (usize, usize),
+    dlf: (usize, usize),
+    fr: (usize, usize),
+    fl: (usize, usize),
+}
+
+impl TwoPairsFrontCase {
+    fn from_cube(cube: &Cube) -> Self {
+        let mut dfr = (0, 0);
+        let mut dlf = (0, 0);
+
+        for (i, Corner { piece, orientation }) in cube.corners.iter().enumerate() {
+            match piece {
+                corner::CornerPiece::Dfr => dfr = (i, *orientation),
+                corner::CornerPiece::Dlf => dlf = (i, *orientation),
+                _ => {}
+            }
+        }
+
+        let mut fr = (0, 0);
+        let mut fl = (0, 0);
+
+        for (i, Edge { piece, orientation }) in cube.edges.iter().enumerate() {
+            match piece {
+                edge::EdgePiece::FR => fr = (i, *orientation),
+                edge::EdgePiece::FL => fl = (i, *orientation),
+                _ => {}
+            }
+        }
+
+        Self { dfr, dlf, fr, fl }
+    }
+}
+
+#[derive(PartialEq, Eq, Hash, Debug)]
+pub struct TwoPairsBackCase {
+    dbl: (usize, usize),
+    drb: (usize, usize),
+    bl: (usize, usize),
+    br: (usize, usize),
+}
+
+impl TwoPairsBackCase {
+    fn from_cube(cube: &Cube) -> Self {
+        let mut dbl = (0, 0);
+        let mut drb = (0, 0);
+
+        for (i, Corner { piece, orientation }) in cube.corners.iter().enumerate() {
+            match piece {
+                corner::CornerPiece::Dbl => dbl = (i, *orientation),
+                corner::CornerPiece::Drb => drb = (i, *orientation),
+                _ => {}
+            }
+        }
+
+        let mut bl = (0, 0);
+        let mut br = (0, 0);
+
+        for (i, Edge { piece, orientation }) in cube.edges.iter().enumerate() {
+            match piece {
+                edge::EdgePiece::BL => bl = (i, *orientation),
+                edge::EdgePiece::BR => br = (i, *orientation),
+                _ => {}
+            }
+        }
+
+        Self { dbl, drb, bl, br }
+    }
+}
 
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct CornerCase {
@@ -86,6 +159,8 @@ pub struct Solver {
     trigger_algs: Vec<Vec<Move>>,
     corner_cases: HashMap<CornerCase, usize>,
     edge_cases: HashMap<EdgeCase, usize>,
+    two_pairs_front_cases: HashMap<TwoPairsFrontCase, usize>,
+    two_pairs_back_cases: HashMap<TwoPairsBackCase, usize>,
 }
 
 impl Default for Solver {
@@ -98,10 +173,22 @@ impl Solver {
     pub fn new() -> Self {
         let corners = Self::generate_heuristic(CORNER_CASES, CornerCase::from_cube, "F2L/Corners");
         let edges = Self::generate_heuristic(EDGE_CASES, EdgeCase::from_cube, "F2L/Edges");
+        let two_pairs_front = Self::generate_heuristic(
+            TWO_PAIRS_CASES,
+            TwoPairsFrontCase::from_cube,
+            "F2L/Two Pairs Front",
+        );
+        let two_pairs_back = Self::generate_heuristic(
+            TWO_PAIRS_CASES,
+            TwoPairsBackCase::from_cube,
+            "F2L/Two Pairs Back",
+        );
         Self {
             trigger_algs: Self::generate_trigger_algs(),
             corner_cases: corners,
             edge_cases: edges,
+            two_pairs_front_cases: two_pairs_front,
+            two_pairs_back_cases: two_pairs_back,
         }
     }
 
@@ -179,9 +266,25 @@ impl Solver {
         // Assess the distance of the cube from the solved state.
         let corner_case = CornerCase::from_cube(cube);
         let edge_case = EdgeCase::from_cube(cube);
+        let two_pairs_front_case = TwoPairsFrontCase::from_cube(cube);
+        let two_pairs_back_case = TwoPairsBackCase::from_cube(cube);
         let corner_distance = self.corner_cases.get(&corner_case).unwrap();
         let edge_distance = self.edge_cases.get(&edge_case).unwrap();
-        *corner_distance.max(edge_distance)
+        let two_pairs_front_distance = self
+            .two_pairs_front_cases
+            .get(&two_pairs_front_case)
+            .unwrap();
+        let two_pairs_back_distance = self.two_pairs_back_cases.get(&two_pairs_back_case).unwrap();
+        [
+            *corner_distance,
+            *edge_distance,
+            *two_pairs_front_distance,
+            *two_pairs_back_distance,
+        ]
+        .iter()
+        .max()
+        .unwrap()
+        .clone()
     }
 
     pub fn solve(&self, cube: &Cube) -> Vec<Move> {
