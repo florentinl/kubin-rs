@@ -47,6 +47,12 @@ pub struct Solver {
     cases: HashMap<Case, Vec<Move>>,
 }
 
+impl Default for Solver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Solver {
     pub fn new() -> Self {
         let cases = Self::get_cases();
@@ -118,7 +124,7 @@ impl Solver {
         ];
 
         for alg in oll_algs {
-            let alg = parse_algorithm(&alg);
+            let alg = parse_algorithm(alg);
             let mut cube = Cube::default();
             cube.execute_algorithm(&invert_algorithm(&alg));
             let case = Case::from_cube(&cube);
@@ -131,7 +137,7 @@ impl Solver {
     pub fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
         for u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
-            cube.execute_move(&u_move);
+            cube.execute_move(u_move);
             let case = Case::from_cube(&cube);
             if let Some(alg) = self.cases.get(&case) {
                 if !matches!(u_move, Move::None) {
@@ -140,7 +146,7 @@ impl Solver {
                     return alg.clone();
                 }
             }
-            cube.execute_move(&invert_move(&u_move));
+            cube.execute_move(&invert_move(u_move));
         }
         vec![]
     }

@@ -10,11 +10,14 @@ use std::{
 
 const CROSS_CASES: usize = 190_080;
 
-use crate::{cube::{
-    self,
-    algorithms::Move,
-    edge::{self, Edge},
-}, solver::utils::print_bfs_progress};
+use crate::{
+    cube::{
+        self,
+        algorithms::Move,
+        edge::{self, Edge},
+    },
+    solver::utils::print_bfs_progress,
+};
 
 use super::utils::print_bfs_terminated;
 
