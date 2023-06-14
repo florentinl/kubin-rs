@@ -10,30 +10,34 @@ use std::{
 
 const CROSS_CASES: usize = 190_080;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{
     cube::{
         self,
         algorithms::Move,
         edge::{self, Edge},
     },
-    solvers::utils::print_bfs_progress,
+    solvers::{
+        solver::{Case, StepSolver},
+        utils::print_bfs_progress,
+    },
 };
 
 use crate::solvers::utils::print_bfs_terminated;
 
 /// Associate each cross piece with its index in the edges array and its orientation.
-#[derive(PartialEq, Eq, Hash, Debug)]
-pub struct Case {
+#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+pub struct CrossCase {
     df: (u8, u8),
     dr: (u8, u8),
     dl: (u8, u8),
     db: (u8, u8),
 }
 
-impl Case {
+impl Case for CrossCase {
     /// Get cross case from the cube.
-    #[must_use]
-    pub fn from_cube(cube: &crate::cube::Cube) -> Self {
+    fn from_cube(cube: &crate::cube::Cube) -> Self {
         let mut df = (0, 0);
         let mut dr = (0, 0);
         let mut dl = (0, 0);
@@ -53,26 +57,12 @@ impl Case {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Solver {
-    cases: HashMap<Case, Vec<Move>>,
-}
-
-impl Default for Solver {
-    fn default() -> Self {
-        Self::new()
-    }
+    cases: HashMap<CrossCase, Vec<Move>>,
 }
 
 impl Solver {
-    #[must_use]
-    pub fn new() -> Self {
-        let mut cross_solver = Self {
-            cases: HashMap::with_capacity(CROSS_CASES),
-        };
-        cross_solver.generate_cases();
-        cross_solver
-    }
-
     fn generate_cases(&mut self) {
         // Using a breadth-first search, generate a lookup table for all possible cross cases.
         let mut queue = VecDeque::with_capacity(CROSS_CASES);
@@ -82,7 +72,7 @@ impl Solver {
             let progress = self.cases.len();
             print_bfs_progress!("Cross", progress, CROSS_CASES);
 
-            let case = Case::from_cube(&cube);
+            let case = CrossCase::from_cube(&cube);
             if self.cases.contains_key(&case) {
                 continue;
             }
@@ -100,9 +90,19 @@ impl Solver {
         }
         print_bfs_terminated!("Cross", self.cases.len(), CROSS_CASES);
     }
+}
 
-    pub fn solve(&self, cube: &crate::cube::Cube) -> Vec<Move> {
-        let case = Case::from_cube(cube);
+impl StepSolver for Solver {
+    fn generate() -> Self {
+        let mut cross_solver = Self {
+            cases: HashMap::with_capacity(CROSS_CASES),
+        };
+        cross_solver.generate_cases();
+        cross_solver
+    }
+
+    fn solve(&self, cube: &crate::cube::Cube) -> Vec<Move> {
+        let case = CrossCase::from_cube(cube);
         self.cases.get(&case).unwrap_or(&Vec::new()).clone()
     }
 }
@@ -113,13 +113,13 @@ mod tests {
 
     #[test]
     fn generate_solutions() {
-        let solver = Solver::new();
+        let solver = Solver::generate();
         assert_eq!(solver.cases.len(), CROSS_CASES);
     }
 
     #[test]
     fn solve_3_move_cross() {
-        let solver = Solver::new();
+        let solver = Solver::generate();
 
         let mut cube = cube::Cube::default();
         let scramble = cube::algorithms::parse_algorithm("R F B'");

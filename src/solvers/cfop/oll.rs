@@ -8,16 +8,21 @@
 
 use std::{collections::HashMap, hash::Hash};
 
-use crate::cube::{
-    self,
-    algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
-    Cube,
+use serde::{Deserialize, Serialize};
+
+use crate::{
+    cube::{
+        self,
+        algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
+        Cube,
+    },
+    solvers::solver::{Case, StepSolver},
 };
 
 const OLL_CASES: usize = 58;
 
-#[derive(PartialEq, Eq, Hash, Debug)]
-struct Case {
+#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+struct OllCase {
     uf: u8,
     ur: u8,
     ub: u8,
@@ -28,7 +33,7 @@ struct Case {
     ufl: u8,
 }
 
-impl Case {
+impl Case for OllCase {
     fn from_cube(cube: &Cube) -> Self {
         Self {
             uf: cube.edges[cube::UF].orientation,
@@ -43,23 +48,13 @@ impl Case {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Solver {
-    cases: HashMap<Case, Vec<Move>>,
-}
-
-impl Default for Solver {
-    fn default() -> Self {
-        Self::new()
-    }
+    cases: HashMap<OllCase, Vec<Move>>,
 }
 
 impl Solver {
-    pub fn new() -> Self {
-        let cases = Self::get_cases();
-        Self { cases }
-    }
-
-    fn get_cases() -> HashMap<Case, Vec<Move>> {
+    fn get_cases() -> HashMap<OllCase, Vec<Move>> {
         let mut cases = HashMap::with_capacity(OLL_CASES);
 
         let oll_algs = vec![
@@ -127,18 +122,25 @@ impl Solver {
             let alg = parse_algorithm(alg);
             let mut cube = Cube::default();
             cube.execute_algorithm(&invert_algorithm(&alg));
-            let case = Case::from_cube(&cube);
+            let case = OllCase::from_cube(&cube);
             cases.insert(case, alg);
         }
 
         cases
     }
+}
 
-    pub fn solve(&self, cube: &Cube) -> Vec<Move> {
+impl StepSolver for Solver {
+    fn generate() -> Self {
+        let cases = Self::get_cases();
+        Self { cases }
+    }
+
+    fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
         for u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
             cube.execute_move(u_move);
-            let case = Case::from_cube(&cube);
+            let case = OllCase::from_cube(&cube);
             if let Some(alg) = self.cases.get(&case) {
                 if !matches!(u_move, Move::None) {
                     return [u_move.clone()].iter().chain(alg.iter()).cloned().collect();

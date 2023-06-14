@@ -8,17 +8,22 @@
 
 use std::{collections::HashMap, hash::Hash};
 
-use crate::cube::{
-    algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
-    corner::CornerPiece,
-    edge::EdgePiece,
-    Cube,
+use serde::{Deserialize, Serialize};
+
+use crate::{
+    cube::{
+        algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
+        corner::CornerPiece,
+        edge::EdgePiece,
+        Cube,
+    },
+    solvers::solver::{Case, StepSolver},
 };
 
 const PLL_CASES: usize = 22 * 4;
 
-#[derive(PartialEq, Eq, Hash, Debug, Clone)]
-struct Case {
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Serialize, Deserialize)]
+struct PllCase {
     ur: usize,
     uf: usize,
     ul: usize,
@@ -29,7 +34,7 @@ struct Case {
     ulb: usize,
 }
 
-impl Case {
+impl Case for PllCase {
     fn from_cube(cube: &Cube) -> Self {
         let mut ur = 0;
         let mut uf = 0;
@@ -73,23 +78,13 @@ impl Case {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Solver {
-    cases: HashMap<Case, Vec<Move>>,
-}
-
-impl Default for Solver {
-    fn default() -> Self {
-        Self::new()
-    }
+    cases: HashMap<PllCase, Vec<Move>>,
 }
 
 impl Solver {
-    pub fn new() -> Self {
-        let cases = Self::get_cases();
-        Self { cases }
-    }
-
-    fn get_cases() -> HashMap<Case, Vec<Move>> {
+    fn get_cases() -> HashMap<PllCase, Vec<Move>> {
         let mut cases = HashMap::with_capacity(PLL_CASES);
 
         let pll_algs = vec![
@@ -121,7 +116,7 @@ impl Solver {
             let alg = parse_algorithm(alg);
             let mut cube = Cube::default();
             cube.execute_algorithm(&invert_algorithm(&alg));
-            let case = Case::from_cube(&cube);
+            let case = PllCase::from_cube(&cube);
             for case in Self::mirror_cases(&case) {
                 cases.insert(case, alg.clone());
             }
@@ -130,8 +125,8 @@ impl Solver {
         cases
     }
 
-    fn mirror_cases(case: &Case) -> Vec<Case> {
-        let Case {
+    fn mirror_cases(case: &PllCase) -> Vec<PllCase> {
+        let PllCase {
             ur,
             uf,
             ul,
@@ -142,10 +137,10 @@ impl Solver {
             ulb,
         } = case;
 
-        let mut cases: Vec<Case> = vec![case.clone()];
+        let mut cases: Vec<PllCase> = vec![case.clone()];
 
         // U move offset
-        cases.push(Case {
+        cases.push(PllCase {
             ur: *ub,
             uf: *ur,
             ul: *uf,
@@ -157,7 +152,7 @@ impl Solver {
         });
 
         // U2 move offset
-        cases.push(Case {
+        cases.push(PllCase {
             ur: *ul,
             uf: *ub,
             ul: *ur,
@@ -169,7 +164,7 @@ impl Solver {
         });
 
         // U' move offset
-        cases.push(Case {
+        cases.push(PllCase {
             ur: *uf,
             uf: *ul,
             ul: *ub,
@@ -186,12 +181,19 @@ impl Solver {
     fn is_solved(&self, cube: &Cube) -> bool {
         *cube == Cube::default()
     }
+}
 
-    pub fn solve(&self, cube: &Cube) -> Vec<Move> {
+impl StepSolver for Solver {
+    fn generate() -> Self {
+        let cases = Self::get_cases();
+        Self { cases }
+    }
+
+    fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
         for pre_u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
             cube.execute_move(pre_u_move);
-            let case = Case::from_cube(&cube);
+            let case = PllCase::from_cube(&cube);
             if let Some(alg) = self.cases.get(&case) {
                 cube.execute_algorithm(alg);
                 // Adjust U face

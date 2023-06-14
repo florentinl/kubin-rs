@@ -1,5 +1,7 @@
 use crate::cube::algorithms::Move;
 
+use super::solver::StepSolver;
+
 pub mod cross;
 pub mod f2l;
 pub mod oll;
@@ -21,10 +23,10 @@ impl Default for Solver {
 impl Solver {
     pub fn new() -> Self {
         Self {
-            cross_solver: cross::Solver::new(),
-            f2l_solver: f2l::Solver::new(),
-            oll_solver: oll::Solver::new(),
-            pll_solver: pll::Solver::new(),
+            cross_solver: cross::Solver::new("/tmp/cross_solver.ron"),
+            f2l_solver: f2l::Solver::new("/tmp/f2l_solver.ron"),
+            oll_solver: oll::Solver::new("/tmp/oll_solver.ron"),
+            pll_solver: pll::Solver::new("/tmp/pll_solver.ron"),
         }
     }
 

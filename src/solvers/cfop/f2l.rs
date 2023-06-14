@@ -11,6 +11,10 @@ use std::{
     io::Write,
 };
 
+use crate::solvers::solver::{Case, StepSolver};
+
+use serde::{Deserialize, Serialize};
+
 use crate::{
     cube::{
         algorithms::{self, Move},
@@ -25,11 +29,7 @@ const CORNER_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(3, 4);
 const EDGE_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(2, 4);
 const TWO_PAIRS_ONE_EDGE_CASES: usize = 8 * 7 * 8 * 7 * 6 * usize::pow(3, 2) * usize::pow(2, 3);
 
-trait Case: PartialEq + Eq + Hash + Debug {
-    fn from_cube(cube: &Cube) -> Self;
-}
-
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 pub struct TwoPairsOneEdgeFrontCase {
     dfr: (u8, u8),
     dlf: (u8, u8),
@@ -74,7 +74,7 @@ impl Case for TwoPairsOneEdgeFrontCase {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 pub struct TwoPairsOneEdgeBackCase {
     dbl: (u8, u8),
     drb: (u8, u8),
@@ -119,7 +119,7 @@ impl Case for TwoPairsOneEdgeBackCase {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 pub struct CornerCase {
     dfr: (u8, u8),
     dlf: (u8, u8),
@@ -148,7 +148,7 @@ impl Case for CornerCase {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
+#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 pub struct EdgeCase {
     fr: (u8, u8),
     fl: (u8, u8),
@@ -177,6 +177,7 @@ impl Case for EdgeCase {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Solver {
     trigger_algs: Vec<Vec<Move>>,
     corner_cases: HashMap<CornerCase, usize>,
@@ -185,29 +186,7 @@ pub struct Solver {
     two_pairs_back_cases: HashMap<TwoPairsOneEdgeBackCase, usize>,
 }
 
-impl Default for Solver {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Solver {
-    pub fn new() -> Self {
-        let corners = Self::generate_heuristic(CORNER_CASES, "F2L/Corners");
-        let edges = Self::generate_heuristic(EDGE_CASES, "F2L/Edges");
-        let two_pairs_front =
-            Self::generate_heuristic(TWO_PAIRS_ONE_EDGE_CASES, "F2L/Two Pairs Front");
-        let two_pairs_back =
-            Self::generate_heuristic(TWO_PAIRS_ONE_EDGE_CASES, "F2L/Two Pairs Back");
-        Self {
-            trigger_algs: Self::generate_trigger_algs(),
-            corner_cases: corners,
-            edge_cases: edges,
-            two_pairs_front_cases: two_pairs_front,
-            two_pairs_back_cases: two_pairs_back,
-        }
-    }
-
     fn generate_trigger_algs() -> Vec<Vec<Move>> {
         let mut algs = vec![];
         for pre_u_move in [Move::U, Move::Up, Move::U2, Move::None].iter() {
@@ -298,23 +277,6 @@ impl Solver {
         .unwrap()
     }
 
-    pub fn solve(&self, cube: &Cube) -> Vec<Move> {
-        // Solve the cube using IDA* with the max of the corner and edge heuristics.
-        let mut cube = cube.clone();
-        let mut bound = self.assess_distance(&cube);
-        let mut path = vec![];
-        loop {
-            let t = self.search(&mut cube, bound, &mut path);
-            if t == 0 {
-                return path.iter().filter(|x| **x != Move::None).cloned().collect();
-            }
-            if t == usize::MAX {
-                return vec![];
-            }
-            bound = t;
-        }
-    }
-
     fn search(&self, cube: &mut Cube, bound: usize, path: &mut Vec<Move>) -> usize {
         let distance = self.assess_distance(cube);
         let local_lower_bound = path.len() + distance;
@@ -345,20 +307,55 @@ impl Solver {
     }
 }
 
+impl StepSolver for Solver {
+    fn generate() -> Self {
+        let corners = Self::generate_heuristic(CORNER_CASES, "F2L/Corners");
+        let edges = Self::generate_heuristic(EDGE_CASES, "F2L/Edges");
+        let two_pairs_front =
+            Self::generate_heuristic(TWO_PAIRS_ONE_EDGE_CASES, "F2L/Two Pairs Front");
+        let two_pairs_back =
+            Self::generate_heuristic(TWO_PAIRS_ONE_EDGE_CASES, "F2L/Two Pairs Back");
+        Self {
+            trigger_algs: Self::generate_trigger_algs(),
+            corner_cases: corners,
+            edge_cases: edges,
+            two_pairs_front_cases: two_pairs_front,
+            two_pairs_back_cases: two_pairs_back,
+        }
+    }
+
+    fn solve(&self, cube: &Cube) -> Vec<Move> {
+        // Solve the cube using IDA* with the max of the corner and edge heuristics.
+        let mut cube = cube.clone();
+        let mut bound = self.assess_distance(&cube);
+        let mut path = vec![];
+        loop {
+            let t = self.search(&mut cube, bound, &mut path);
+            if t == 0 {
+                return path.iter().filter(|x| **x != Move::None).cloned().collect();
+            }
+            if t == usize::MAX {
+                return vec![];
+            }
+            bound = t;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_generate_all_cases() {
-        let solver = Solver::new();
+        let solver = Solver::generate();
         assert_eq!(solver.edge_cases.len(), EDGE_CASES);
         assert_eq!(solver.corner_cases.len(), CORNER_CASES);
     }
 
     #[test]
     fn test_solving_f2l() {
-        let solver = Solver::new();
+        let solver = Solver::generate();
         let mut cube = Cube::default();
         let scramble = algorithms::parse_algorithm("R U R' U' R U2 R'");
         cube.execute_algorithm(&scramble);
