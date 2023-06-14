@@ -18,7 +18,7 @@ use crate::{
         edge::{self, Edge},
         Cube,
     },
-    solver::utils::{print_bfs_progress, print_bfs_terminated},
+    solvers::utils::{print_bfs_progress, print_bfs_terminated},
 };
 
 const CORNER_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(3, 4);

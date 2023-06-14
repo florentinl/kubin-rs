@@ -16,10 +16,10 @@ use crate::{
         algorithms::Move,
         edge::{self, Edge},
     },
-    solver::utils::print_bfs_progress,
+    solvers::utils::print_bfs_progress,
 };
 
-use super::utils::print_bfs_terminated;
+use crate::solvers::utils::print_bfs_terminated;
 
 /// Associate each cross piece with its index in the edges array and its orientation.
 #[derive(PartialEq, Eq, Hash, Debug)]

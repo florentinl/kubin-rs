@@ -1,3 +1,3 @@
 pub mod cube;
 pub mod scramble;
-pub mod solver;
+pub mod solvers;
