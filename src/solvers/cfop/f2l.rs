@@ -27,10 +27,10 @@ const TWO_PAIRS_CASES: usize = 8 * 7 * 8 * 7 * usize::pow(3, 2) * usize::pow(2, 
 
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct TwoPairsFrontCase {
-    dfr: (usize, usize),
-    dlf: (usize, usize),
-    fr: (usize, usize),
-    fl: (usize, usize),
+    dfr: (u8, u8),
+    dlf: (u8, u8),
+    fr: (u8, u8),
+    fl: (u8, u8),
 }
 
 impl TwoPairsFrontCase {
@@ -38,7 +38,7 @@ impl TwoPairsFrontCase {
         let mut dfr = (0, 0);
         let mut dlf = (0, 0);
 
-        for (i, Corner { piece, orientation }) in cube.corners.iter().enumerate() {
+        for (Corner { piece, orientation }, i) in cube.corners.iter().zip(0..) {
             match piece {
                 corner::CornerPiece::Dfr => dfr = (i, *orientation),
                 corner::CornerPiece::Dlf => dlf = (i, *orientation),
@@ -49,7 +49,7 @@ impl TwoPairsFrontCase {
         let mut fr = (0, 0);
         let mut fl = (0, 0);
 
-        for (i, Edge { piece, orientation }) in cube.edges.iter().enumerate() {
+        for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
             match piece {
                 edge::EdgePiece::FR => fr = (i, *orientation),
                 edge::EdgePiece::FL => fl = (i, *orientation),
@@ -63,10 +63,10 @@ impl TwoPairsFrontCase {
 
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct TwoPairsBackCase {
-    dbl: (usize, usize),
-    drb: (usize, usize),
-    bl: (usize, usize),
-    br: (usize, usize),
+    dbl: (u8, u8),
+    drb: (u8, u8),
+    bl: (u8, u8),
+    br: (u8, u8),
 }
 
 impl TwoPairsBackCase {
@@ -74,7 +74,7 @@ impl TwoPairsBackCase {
         let mut dbl = (0, 0);
         let mut drb = (0, 0);
 
-        for (i, Corner { piece, orientation }) in cube.corners.iter().enumerate() {
+        for (Corner { piece, orientation }, i) in cube.corners.iter().zip(0..) {
             match piece {
                 corner::CornerPiece::Dbl => dbl = (i, *orientation),
                 corner::CornerPiece::Drb => drb = (i, *orientation),
@@ -85,7 +85,7 @@ impl TwoPairsBackCase {
         let mut bl = (0, 0);
         let mut br = (0, 0);
 
-        for (i, Edge { piece, orientation }) in cube.edges.iter().enumerate() {
+        for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
             match piece {
                 edge::EdgePiece::BL => bl = (i, *orientation),
                 edge::EdgePiece::BR => br = (i, *orientation),
@@ -99,10 +99,10 @@ impl TwoPairsBackCase {
 
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct CornerCase {
-    dfr: (usize, usize),
-    dlf: (usize, usize),
-    dbl: (usize, usize),
-    drb: (usize, usize),
+    dfr: (u8, u8),
+    dlf: (u8, u8),
+    dbl: (u8, u8),
+    drb: (u8, u8),
 }
 
 impl CornerCase {
@@ -112,7 +112,7 @@ impl CornerCase {
         let mut dbl = (0, 0);
         let mut drb = (0, 0);
 
-        for (i, Corner { piece, orientation }) in cube.corners.iter().enumerate() {
+        for (Corner { piece, orientation }, i) in cube.corners.iter().zip(0..) {
             match piece {
                 corner::CornerPiece::Dfr => dfr = (i, *orientation),
                 corner::CornerPiece::Dlf => dlf = (i, *orientation),
@@ -128,10 +128,10 @@ impl CornerCase {
 
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct EdgeCase {
-    fr: (usize, usize),
-    fl: (usize, usize),
-    bl: (usize, usize),
-    br: (usize, usize),
+    fr: (u8, u8),
+    fl: (u8, u8),
+    bl: (u8, u8),
+    br: (u8, u8),
 }
 
 impl EdgeCase {
@@ -141,7 +141,7 @@ impl EdgeCase {
         let mut bl = (0, 0);
         let mut br = (0, 0);
 
-        for (i, Edge { piece, orientation }) in cube.edges.iter().enumerate() {
+        for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
             match piece {
                 edge::EdgePiece::FR => fr = (i, *orientation),
                 edge::EdgePiece::FL => fl = (i, *orientation),

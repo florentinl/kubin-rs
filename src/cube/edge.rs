@@ -1,7 +1,7 @@
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct Edge {
     pub(crate) piece: EdgePiece,
-    pub(crate) orientation: usize,
+    pub(crate) orientation: u8,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -21,7 +21,7 @@ pub(crate) enum EdgePiece {
 }
 
 impl Edge {
-    pub(super) fn new(piece: EdgePiece, orientation: usize) -> Self {
+    pub(super) fn new(piece: EdgePiece, orientation: u8) -> Self {
         Self { piece, orientation }
     }
 

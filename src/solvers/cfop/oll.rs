@@ -18,14 +18,14 @@ const OLL_CASES: usize = 58;
 
 #[derive(PartialEq, Eq, Hash, Debug)]
 struct Case {
-    uf: usize,
-    ur: usize,
-    ub: usize,
-    ul: usize,
-    urf: usize,
-    ubr: usize,
-    ulb: usize,
-    ufl: usize,
+    uf: u8,
+    ur: u8,
+    ub: u8,
+    ul: u8,
+    urf: u8,
+    ubr: u8,
+    ulb: u8,
+    ufl: u8,
 }
 
 impl Case {

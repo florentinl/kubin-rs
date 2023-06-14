@@ -6,7 +6,7 @@ use kubin_rs::{
 /// Repl to run the program interactively
 pub fn main() {
     let mut scrambles = vec![];
-    for _ in 0..1000 {
+    for _ in 0..100 {
         scrambles.push(scramble::generate_scramble());
     }
 

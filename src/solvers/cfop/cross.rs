@@ -24,10 +24,10 @@ use crate::solvers::utils::print_bfs_terminated;
 /// Associate each cross piece with its index in the edges array and its orientation.
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct Case {
-    df: (usize, usize),
-    dr: (usize, usize),
-    dl: (usize, usize),
-    db: (usize, usize),
+    df: (u8, u8),
+    dr: (u8, u8),
+    dl: (u8, u8),
+    db: (u8, u8),
 }
 
 impl Case {
@@ -39,7 +39,7 @@ impl Case {
         let mut dl = (0, 0);
         let mut db = (0, 0);
 
-        for (i, Edge { piece, orientation }) in cube.edges.iter().enumerate() {
+        for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
             match piece {
                 edge::EdgePiece::DF => df = (i, *orientation),
                 edge::EdgePiece::DR => dr = (i, *orientation),
