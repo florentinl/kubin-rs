@@ -21,7 +21,7 @@ use crate::{
 
 const OLL_CASES: usize = 58;
 
-#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
 struct OllCase {
     uf: u8,
     ur: u8,

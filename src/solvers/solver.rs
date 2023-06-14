@@ -1,6 +1,5 @@
 use std::{
     error::Error,
-    fmt::Debug,
     fs::File,
     io::{BufReader, Read, Write},
 };
@@ -43,7 +42,7 @@ pub(super) trait StepSolver: Sized + Serialize + for<'de> Deserialize<'de> {
 }
 
 pub(super) trait Case:
-    PartialEq + Eq + Hash + Debug + Serialize + for<'de> Deserialize<'de>
+    PartialEq + Eq + Hash + Serialize + for<'de> Deserialize<'de>
 {
     fn from_cube(cube: &Cube) -> Self;
 }

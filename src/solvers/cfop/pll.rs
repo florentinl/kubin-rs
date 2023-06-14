@@ -22,7 +22,7 @@ use crate::{
 
 const PLL_CASES: usize = 22 * 4;
 
-#[derive(PartialEq, Eq, Hash, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
 struct PllCase {
     ur: usize,
     uf: usize,

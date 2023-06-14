@@ -6,7 +6,6 @@
 
 use std::{
     collections::{HashMap, VecDeque},
-    fmt::Debug,
     hash::Hash,
     io::Write,
 };
@@ -29,7 +28,7 @@ const CORNER_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(3, 4);
 const EDGE_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(2, 4);
 const TWO_PAIRS_ONE_EDGE_CASES: usize = 8 * 7 * 8 * 7 * 6 * usize::pow(3, 2) * usize::pow(2, 3);
 
-#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct TwoPairsOneEdgeFrontCase {
     dfr: (u8, u8),
     dlf: (u8, u8),
@@ -74,7 +73,7 @@ impl Case for TwoPairsOneEdgeFrontCase {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct TwoPairsOneEdgeBackCase {
     dbl: (u8, u8),
     drb: (u8, u8),
@@ -119,7 +118,7 @@ impl Case for TwoPairsOneEdgeBackCase {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct CornerCase {
     dfr: (u8, u8),
     dlf: (u8, u8),
@@ -148,7 +147,7 @@ impl Case for CornerCase {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct EdgeCase {
     fr: (u8, u8),
     fl: (u8, u8),
@@ -177,7 +176,7 @@ impl Case for EdgeCase {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 pub struct Solver {
     trigger_algs: Vec<Vec<Move>>,
     corner_cases: HashMap<CornerCase, usize>,

@@ -27,7 +27,7 @@ use crate::{
 use crate::solvers::utils::print_bfs_terminated;
 
 /// Associate each cross piece with its index in the edges array and its orientation.
-#[derive(PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct CrossCase {
     df: (u8, u8),
     dr: (u8, u8),
@@ -57,7 +57,7 @@ impl Case for CrossCase {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 pub struct Solver {
     cases: HashMap<CrossCase, Vec<Move>>,
 }
