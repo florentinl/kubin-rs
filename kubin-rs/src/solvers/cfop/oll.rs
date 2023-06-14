@@ -10,12 +10,11 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    cube::{
-        algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
-        Cube,
-    },
-    solvers::{cube_subsets::CubeSubset, solver::StepSolver},
+use crate::solvers::{cube_subsets::CubeSubset, solver::StepSolver};
+
+use cube::{
+    algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
+    Cube,
 };
 
 use crate::solvers::cube_subsets::Oll;

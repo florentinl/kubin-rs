@@ -3,37 +3,38 @@ use self::algorithms::Move;
 pub mod algorithms;
 pub mod corner;
 pub mod edge;
+pub mod subcases;
 
 /// Edges in the following order: UR, UF, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR
-pub(crate) const UR: usize = 0;
-pub(crate) const UF: usize = 1;
-pub(crate) const UL: usize = 2;
-pub(crate) const UB: usize = 3;
-pub(crate) const DR: usize = 4;
-pub(crate) const DF: usize = 5;
-pub(crate) const DL: usize = 6;
-pub(crate) const DB: usize = 7;
-pub(crate) const FR: usize = 8;
-pub(crate) const FL: usize = 9;
-pub(crate) const BL: usize = 10;
-pub(crate) const BR: usize = 11;
+pub const UR: usize = 0;
+pub const UF: usize = 1;
+pub const UL: usize = 2;
+pub const UB: usize = 3;
+pub const DR: usize = 4;
+pub const DF: usize = 5;
+pub const DL: usize = 6;
+pub const DB: usize = 7;
+pub const FR: usize = 8;
+pub const FL: usize = 9;
+pub const BL: usize = 10;
+pub const BR: usize = 11;
 
 /// Corners in the following order: URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB
-pub(crate) const URF: usize = 0;
-pub(crate) const UFL: usize = 1;
-pub(crate) const ULB: usize = 2;
-pub(crate) const UBR: usize = 3;
-pub(crate) const DFR: usize = 4;
-pub(crate) const DLF: usize = 5;
-pub(crate) const DBL: usize = 6;
-pub(crate) const DRB: usize = 7;
+pub const URF: usize = 0;
+pub const UFL: usize = 1;
+pub const ULB: usize = 2;
+pub const UBR: usize = 3;
+pub const DFR: usize = 4;
+pub const DLF: usize = 5;
+pub const DBL: usize = 6;
+pub const DRB: usize = 7;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Cube {
     /// Edges in the following order: UR, UF, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR
-    pub(crate) edges: [edge::Edge; 12],
+    pub edges: [edge::Edge; 12],
     /// Corners in the following order: URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB
-    pub(crate) corners: [corner::Corner; 8],
+    pub corners: [corner::Corner; 8],
 }
 
 impl Default for Cube {
@@ -68,7 +69,7 @@ impl Default for Cube {
 }
 
 impl Cube {
-    pub(crate) fn execute_move(&mut self, move_: &Move) {
+    pub fn execute_move(&mut self, move_: &Move) {
         match move_ {
             Move::U => self.u(),
             Move::U2 => self.u2(),

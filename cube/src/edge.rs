@@ -1,11 +1,11 @@
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct Edge {
-    pub(crate) piece: EdgePiece,
-    pub(crate) orientation: u8,
+pub struct Edge {
+    pub piece: EdgePiece,
+    pub orientation: u8,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) enum EdgePiece {
+pub enum EdgePiece {
     UR,
     UF,
     UL,

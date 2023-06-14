@@ -1,12 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    cube::{
-        corner::{self, Corner},
-        edge::{self, Edge},
-        Cube,
-    },
-    solvers::cube_subsets::CubeSubset,
+use crate::solvers::cube_subsets::CubeSubset;
+
+use cube::{
+    corner::{self, Corner},
+    edge::{self, Edge},
+    Cube,
 };
 
 pub(crate) const CORNER_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(3, 4);

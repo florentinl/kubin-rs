@@ -9,7 +9,6 @@ use std::{
 };
 
 use crate::{
-    cube::{self, algorithms::Move},
     solvers::{
         cube_subsets::CROSS_CASES,
         cube_subsets::{Cross, CubeSubset},
@@ -18,6 +17,7 @@ use crate::{
     },
 };
 use serde::{Deserialize, Serialize};
+use     cube::{self, algorithms::Move, Cube};
 
 use crate::solvers::utils::print_bfs_terminated;
 
@@ -65,7 +65,7 @@ impl StepSolver for Solver {
         cross_solver
     }
 
-    fn solve(&self, cube: &crate::cube::Cube) -> Vec<Move> {
+    fn solve(&self, cube: &Cube) -> Vec<Move> {
         let case = Cross::from_cube(cube);
         self.cases.get(&case).unwrap_or(&Vec::new()).clone()
     }

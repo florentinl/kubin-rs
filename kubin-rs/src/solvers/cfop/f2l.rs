@@ -20,12 +20,10 @@ use crate::solvers::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    cube::{
-        algorithms::{self, Move},
-        Cube,
-    },
     solvers::utils::{print_bfs_progress, print_bfs_terminated},
 };
+
+use cube::{self, algorithms::{Move, self}, Cube};
 
 #[derive(Serialize, Deserialize)]
 pub struct Solver {

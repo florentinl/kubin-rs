@@ -49,7 +49,7 @@ impl ToString for Move {
     }
 }
 
-pub(crate) const ALL_MOVES: [Move; 18] = [
+pub const ALL_MOVES: [Move; 18] = [
     Move::U,
     Move::U2,
     Move::Up,
@@ -95,7 +95,6 @@ pub fn invert_move(move_: &Move) -> Move {
     }
 }
 
-#[must_use]
 pub fn invert_algorithm(algorithm: &[Move]) -> Vec<Move> {
     let mut inverted_algorithm = Vec::with_capacity(algorithm.len());
     for move_ in algorithm.iter().rev() {
@@ -104,7 +103,6 @@ pub fn invert_algorithm(algorithm: &[Move]) -> Vec<Move> {
     inverted_algorithm
 }
 
-#[must_use]
 pub fn parse_algorithm(algorithm: &str) -> Vec<Move> {
     let mut parsed_algorithm = Vec::with_capacity(algorithm.len());
     let mut chars = algorithm.chars();

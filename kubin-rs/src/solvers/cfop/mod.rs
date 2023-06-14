@@ -1,4 +1,4 @@
-use crate::cube::algorithms::Move;
+use cube::{algorithms::Move, Cube};
 
 use super::solver::StepSolver;
 
@@ -30,7 +30,7 @@ impl Solver {
         }
     }
 
-    pub fn solve(&self, cube: &crate::cube::Cube) -> Vec<Move> {
+    pub fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
 
         let cross_solution = self.cross_solver.solve(&cube);

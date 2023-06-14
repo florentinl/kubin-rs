@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    cube::{self, Cube},
-    solvers::cube_subsets::CubeSubset,
-};
+use crate::solvers::cube_subsets::CubeSubset;
+
+use cube::{self, Cube};
 
 pub(crate) const OLL_CASES: usize = 58;
 

@@ -1,11 +1,11 @@
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct Corner {
-    pub(crate) piece: CornerPiece,
-    pub(crate) orientation: u8,
+pub struct Corner {
+    pub piece: CornerPiece,
+    pub orientation: u8,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) enum CornerPiece {
+pub enum CornerPiece {
     Urf,
     Ufl,
     Ulb,

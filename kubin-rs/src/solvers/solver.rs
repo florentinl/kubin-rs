@@ -4,7 +4,7 @@ use std::{
     io::{BufReader, Read, Write},
 };
 
-use crate::cube::{algorithms::Move, Cube};
+use cube::{algorithms::Move, Cube};
 use serde::{Deserialize, Serialize};
 
 pub(super) trait StepSolver: Sized + Serialize + for<'de> Deserialize<'de> {

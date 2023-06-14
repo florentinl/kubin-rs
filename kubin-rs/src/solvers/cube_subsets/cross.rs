@@ -1,9 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    cube::edge::{self, Edge},
-    solvers::cube_subsets::CubeSubset,
-};
+use crate::solvers::cube_subsets::CubeSubset;
+
+use cube::{edge::{self, Edge}, Cube};
 
 pub(crate) const CROSS_CASES: usize = 190_080;
 
@@ -18,7 +17,7 @@ pub(crate) struct Cross {
 
 impl CubeSubset for Cross {
     /// Get cross case from the cube.
-    fn from_cube(cube: &crate::cube::Cube) -> Self {
+    fn from_cube(cube: &Cube) -> Self {
         let mut df = (0, 0);
         let mut dr = (0, 0);
         let mut dl = (0, 0);

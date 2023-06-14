@@ -3,7 +3,7 @@ mod f2l;
 mod oll;
 mod pll;
 
-use crate::cube::Cube;
+use cube::Cube;
 use serde::{Deserialize, Serialize};
 use std::hash::Hash;
 

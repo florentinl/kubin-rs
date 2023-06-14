@@ -1,7 +1,6 @@
-use kubin_rs::{
-    cube::{self},
-    scramble, solvers,
-};
+use kubin_rs::{scramble, solvers};
+
+use cube::{self};
 
 /// Repl to run the program interactively
 pub fn main() {
