@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::solvers::cube_subsets::CubeSubset;
+use cube::subcases::CubeSubset;
 use cube::{corner::CornerPiece, edge::EdgePiece, Cube};
 pub(crate) const PLL_CASES: usize = 22 * 4;
 

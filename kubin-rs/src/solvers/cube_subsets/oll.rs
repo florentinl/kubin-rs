@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::solvers::cube_subsets::CubeSubset;
+use cube::subcases::CubeSubset;
 
 use cube::{self, Cube};
 

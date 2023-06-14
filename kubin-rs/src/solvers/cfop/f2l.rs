@@ -11,7 +11,7 @@ use std::{
 
 use crate::solvers::{
     cube_subsets::{
-        Corners, CubeSubset, Edges, TwoBackPairsOneEdge, TwoFrontPairsOneEdge, CORNER_CASES,
+        Corners, Edges, TwoBackPairsOneEdge, TwoFrontPairsOneEdge, CORNER_CASES,
         EDGE_CASES, TWO_PAIRS_ONE_EDGE_CASES,
     },
     solver::StepSolver,
@@ -24,6 +24,7 @@ use crate::{
 };
 
 use cube::{self, algorithms::{Move, self}, Cube};
+use cube::subcases::CubeSubset;
 
 #[derive(Serialize, Deserialize)]
 pub struct Solver {
