@@ -10,7 +10,9 @@ pub fn main() {
         scrambles.push(scramble::generate_scramble());
     }
 
+    let now = std::time::Instant::now();
     let solver = solvers::cfop::Solver::new();
+    println!("Solver created in {:?}", now.elapsed());
 
     let mut times = vec![];
     let mut lengths = vec![];

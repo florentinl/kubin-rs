@@ -23,17 +23,18 @@ use crate::{
 
 const CORNER_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(3, 4);
 const EDGE_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(2, 4);
-const TWO_PAIRS_CASES: usize = 8 * 7 * 8 * 7 * usize::pow(3, 2) * usize::pow(2, 2);
+const TWO_PAIRS_ONE_EDGE_CASES: usize = 8 * 7 * 8 * 7 * 6 * usize::pow(3, 2) * usize::pow(2, 3);
 
 #[derive(PartialEq, Eq, Hash, Debug)]
-pub struct TwoPairsFrontCase {
+pub struct TwoPairsOneEdgeFrontCase {
     dfr: (u8, u8),
     dlf: (u8, u8),
     fr: (u8, u8),
     fl: (u8, u8),
+    br: (u8, u8),
 }
 
-impl TwoPairsFrontCase {
+impl TwoPairsOneEdgeFrontCase {
     fn from_cube(cube: &Cube) -> Self {
         let mut dfr = (0, 0);
         let mut dlf = (0, 0);
@@ -48,28 +49,37 @@ impl TwoPairsFrontCase {
 
         let mut fr = (0, 0);
         let mut fl = (0, 0);
+        let mut br = (0, 0);
 
         for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
             match piece {
                 edge::EdgePiece::FR => fr = (i, *orientation),
                 edge::EdgePiece::FL => fl = (i, *orientation),
+                edge::EdgePiece::BR => br = (i, *orientation),
                 _ => {}
             }
         }
 
-        Self { dfr, dlf, fr, fl }
+        Self {
+            dfr,
+            dlf,
+            fr,
+            fl,
+            br,
+        }
     }
 }
 
 #[derive(PartialEq, Eq, Hash, Debug)]
-pub struct TwoPairsBackCase {
+pub struct TwoPairsOneEdgeBackCase {
     dbl: (u8, u8),
     drb: (u8, u8),
     bl: (u8, u8),
     br: (u8, u8),
+    fr: (u8, u8),
 }
 
-impl TwoPairsBackCase {
+impl TwoPairsOneEdgeBackCase {
     fn from_cube(cube: &Cube) -> Self {
         let mut dbl = (0, 0);
         let mut drb = (0, 0);
@@ -84,16 +94,24 @@ impl TwoPairsBackCase {
 
         let mut bl = (0, 0);
         let mut br = (0, 0);
+        let mut fr = (0, 0);
 
         for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
             match piece {
                 edge::EdgePiece::BL => bl = (i, *orientation),
                 edge::EdgePiece::BR => br = (i, *orientation),
+                edge::EdgePiece::FR => fr = (i, *orientation),
                 _ => {}
             }
         }
 
-        Self { dbl, drb, bl, br }
+        Self {
+            dbl,
+            drb,
+            bl,
+            br,
+            fr,
+        }
     }
 }
 
@@ -159,8 +177,8 @@ pub struct Solver {
     trigger_algs: Vec<Vec<Move>>,
     corner_cases: HashMap<CornerCase, usize>,
     edge_cases: HashMap<EdgeCase, usize>,
-    two_pairs_front_cases: HashMap<TwoPairsFrontCase, usize>,
-    two_pairs_back_cases: HashMap<TwoPairsBackCase, usize>,
+    two_pairs_front_cases: HashMap<TwoPairsOneEdgeFrontCase, usize>,
+    two_pairs_back_cases: HashMap<TwoPairsOneEdgeBackCase, usize>,
 }
 
 impl Default for Solver {
@@ -174,13 +192,13 @@ impl Solver {
         let corners = Self::generate_heuristic(CORNER_CASES, CornerCase::from_cube, "F2L/Corners");
         let edges = Self::generate_heuristic(EDGE_CASES, EdgeCase::from_cube, "F2L/Edges");
         let two_pairs_front = Self::generate_heuristic(
-            TWO_PAIRS_CASES,
-            TwoPairsFrontCase::from_cube,
+            TWO_PAIRS_ONE_EDGE_CASES,
+            TwoPairsOneEdgeFrontCase::from_cube,
             "F2L/Two Pairs Front",
         );
         let two_pairs_back = Self::generate_heuristic(
-            TWO_PAIRS_CASES,
-            TwoPairsBackCase::from_cube,
+            TWO_PAIRS_ONE_EDGE_CASES,
+            TwoPairsOneEdgeBackCase::from_cube,
             "F2L/Two Pairs Back",
         );
         Self {
@@ -266,8 +284,8 @@ impl Solver {
         // Assess the distance of the cube from the solved state.
         let corner_case = CornerCase::from_cube(cube);
         let edge_case = EdgeCase::from_cube(cube);
-        let two_pairs_front_case = TwoPairsFrontCase::from_cube(cube);
-        let two_pairs_back_case = TwoPairsBackCase::from_cube(cube);
+        let two_pairs_front_case = TwoPairsOneEdgeFrontCase::from_cube(cube);
+        let two_pairs_back_case = TwoPairsOneEdgeBackCase::from_cube(cube);
         let corner_distance = self.corner_cases.get(&corner_case).unwrap();
         let edge_distance = self.edge_cases.get(&edge_case).unwrap();
         let two_pairs_front_distance = self
