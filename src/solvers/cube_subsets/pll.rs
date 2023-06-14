@@ -9,14 +9,14 @@ pub(crate) const PLL_CASES: usize = 22 * 4;
 
 #[derive(PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
 pub(crate) struct Pll {
-    ur: usize,
-    uf: usize,
-    ul: usize,
-    ub: usize,
-    ufr: usize,
-    ubr: usize,
-    ufl: usize,
-    ulb: usize,
+    ur: u8,
+    uf: u8,
+    ul: u8,
+    ub: u8,
+    ufr: u8,
+    ubr: u8,
+    ufl: u8,
+    ulb: u8,
 }
 
 impl CubeSubset for Pll {
@@ -30,7 +30,7 @@ impl CubeSubset for Pll {
         let mut ufl = 0;
         let mut ulb = 0;
 
-        for (i, edge) in cube.edges.iter().enumerate() {
+        for (edge, i) in cube.edges.iter().zip(0..) {
             match edge.piece {
                 EdgePiece::UR => ur = i,
                 EdgePiece::UF => uf = i,
@@ -40,7 +40,7 @@ impl CubeSubset for Pll {
             }
         }
 
-        for (i, corner) in cube.corners.iter().enumerate() {
+        for (corner, i) in cube.corners.iter().zip(0..) {
             match corner.piece {
                 CornerPiece::Urf => ufr = i,
                 CornerPiece::Ubr => ubr = i,
