@@ -16,10 +16,10 @@ pub(super) trait CubeSubset:
 pub(super) use self::cross::Cross;
 pub(super) use self::cross::CROSS_CASES;
 
-pub(super) use self::f2l::CornerCase;
-pub(super) use self::f2l::EdgeCase;
-pub(super) use self::f2l::TwoPairsOneEdgeBackCase;
-pub(super) use self::f2l::TwoPairsOneEdgeFrontCase;
+pub(super) use self::f2l::Corners;
+pub(super) use self::f2l::Edges;
+pub(super) use self::f2l::TwoBackPairsOneEdge;
+pub(super) use self::f2l::TwoFrontPairsOneEdge;
 pub(super) use self::f2l::CORNER_CASES;
 pub(super) use self::f2l::EDGE_CASES;
 pub(super) use self::f2l::TWO_PAIRS_ONE_EDGE_CASES;

@@ -11,8 +11,8 @@ use std::{
 
 use crate::solvers::{
     cube_subsets::{
-        CornerCase, CubeSubset, EdgeCase, TwoPairsOneEdgeBackCase, TwoPairsOneEdgeFrontCase,
-        CORNER_CASES, EDGE_CASES, TWO_PAIRS_ONE_EDGE_CASES,
+        Corners, CubeSubset, Edges, TwoBackPairsOneEdge, TwoFrontPairsOneEdge, CORNER_CASES,
+        EDGE_CASES, TWO_PAIRS_ONE_EDGE_CASES,
     },
     solver::StepSolver,
 };
@@ -30,10 +30,10 @@ use crate::{
 #[derive(Serialize, Deserialize)]
 pub struct Solver {
     trigger_algs: Vec<Vec<Move>>,
-    corner_cases: HashMap<CornerCase, usize>,
-    edge_cases: HashMap<EdgeCase, usize>,
-    two_pairs_front_cases: HashMap<TwoPairsOneEdgeFrontCase, usize>,
-    two_pairs_back_cases: HashMap<TwoPairsOneEdgeBackCase, usize>,
+    corner_cases: HashMap<Corners, usize>,
+    edge_cases: HashMap<Edges, usize>,
+    two_front_pairs_cases: HashMap<TwoFrontPairsOneEdge, usize>,
+    two_back_pairs_cases: HashMap<TwoBackPairsOneEdge, usize>,
 }
 
 impl Solver {
@@ -105,26 +105,21 @@ impl Solver {
 
     fn assess_distance(&self, cube: &Cube) -> usize {
         // Assess the distance of the cube from the solved state.
-        let corner_case = CornerCase::from_cube(cube);
-        let edge_case = EdgeCase::from_cube(cube);
-        let two_pairs_front_case = TwoPairsOneEdgeFrontCase::from_cube(cube);
-        let two_pairs_back_case = TwoPairsOneEdgeBackCase::from_cube(cube);
-        let corner_distance = self.corner_cases.get(&corner_case).unwrap();
-        let edge_distance = self.edge_cases.get(&edge_case).unwrap();
-        let two_pairs_front_distance = self
-            .two_pairs_front_cases
-            .get(&two_pairs_front_case)
-            .unwrap();
-        let two_pairs_back_distance = self.two_pairs_back_cases.get(&two_pairs_back_case).unwrap();
-        *[
-            *corner_distance,
-            *edge_distance,
-            *two_pairs_front_distance,
-            *two_pairs_back_distance,
-        ]
-        .iter()
-        .max()
-        .unwrap()
+        *self
+            .corner_cases
+            .get(&Corners::from_cube(cube))
+            .unwrap()
+            .max(self.edge_cases.get(&Edges::from_cube(cube)).unwrap())
+            .max(
+                self.two_front_pairs_cases
+                    .get(&TwoFrontPairsOneEdge::from_cube(cube))
+                    .unwrap(),
+            )
+            .max(
+                self.two_back_pairs_cases
+                    .get(&TwoBackPairsOneEdge::from_cube(cube))
+                    .unwrap(),
+            )
     }
 
     fn search(&self, cube: &mut Cube, bound: usize, path: &mut Vec<Move>) -> usize {
@@ -169,8 +164,8 @@ impl StepSolver for Solver {
             trigger_algs: Self::generate_trigger_algs(),
             corner_cases: corners,
             edge_cases: edges,
-            two_pairs_front_cases: two_pairs_front,
-            two_pairs_back_cases: two_pairs_back,
+            two_front_pairs_cases: two_pairs_front,
+            two_back_pairs_cases: two_pairs_back,
         }
     }
 

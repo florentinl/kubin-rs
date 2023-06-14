@@ -15,7 +15,7 @@ pub(crate) const TWO_PAIRS_ONE_EDGE_CASES: usize =
     8 * 7 * 8 * 7 * 6 * usize::pow(3, 2) * usize::pow(2, 3);
 
 #[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct TwoPairsOneEdgeFrontCase {
+pub struct TwoFrontPairsOneEdge {
     dfr: (u8, u8),
     dlf: (u8, u8),
     fr: (u8, u8),
@@ -23,7 +23,7 @@ pub struct TwoPairsOneEdgeFrontCase {
     br: (u8, u8),
 }
 
-impl CubeSubset for TwoPairsOneEdgeFrontCase {
+impl CubeSubset for TwoFrontPairsOneEdge {
     fn from_cube(cube: &Cube) -> Self {
         let mut dfr = (0, 0);
         let mut dlf = (0, 0);
@@ -60,7 +60,7 @@ impl CubeSubset for TwoPairsOneEdgeFrontCase {
 }
 
 #[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct TwoPairsOneEdgeBackCase {
+pub struct TwoBackPairsOneEdge {
     dbl: (u8, u8),
     drb: (u8, u8),
     bl: (u8, u8),
@@ -68,7 +68,7 @@ pub struct TwoPairsOneEdgeBackCase {
     fr: (u8, u8),
 }
 
-impl CubeSubset for TwoPairsOneEdgeBackCase {
+impl CubeSubset for TwoBackPairsOneEdge {
     fn from_cube(cube: &Cube) -> Self {
         let mut dbl = (0, 0);
         let mut drb = (0, 0);
@@ -105,14 +105,14 @@ impl CubeSubset for TwoPairsOneEdgeBackCase {
 }
 
 #[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct CornerCase {
+pub struct Corners {
     dfr: (u8, u8),
     dlf: (u8, u8),
     dbl: (u8, u8),
     drb: (u8, u8),
 }
 
-impl CubeSubset for CornerCase {
+impl CubeSubset for Corners {
     fn from_cube(cube: &Cube) -> Self {
         let mut dfr = (0, 0);
         let mut dlf = (0, 0);
@@ -134,14 +134,14 @@ impl CubeSubset for CornerCase {
 }
 
 #[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct EdgeCase {
+pub struct Edges {
     fr: (u8, u8),
     fl: (u8, u8),
     bl: (u8, u8),
     br: (u8, u8),
 }
 
-impl CubeSubset for EdgeCase {
+impl CubeSubset for Edges {
     fn from_cube(cube: &Cube) -> Self {
         let mut fr = (0, 0);
         let mut fl = (0, 0);
