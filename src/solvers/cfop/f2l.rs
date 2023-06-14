@@ -25,6 +25,10 @@ const CORNER_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(3, 4);
 const EDGE_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(2, 4);
 const TWO_PAIRS_ONE_EDGE_CASES: usize = 8 * 7 * 8 * 7 * 6 * usize::pow(3, 2) * usize::pow(2, 3);
 
+trait Case: PartialEq + Eq + Hash + Debug {
+    fn from_cube(cube: &Cube) -> Self;
+}
+
 #[derive(PartialEq, Eq, Hash, Debug)]
 pub struct TwoPairsOneEdgeFrontCase {
     dfr: (u8, u8),
@@ -34,7 +38,7 @@ pub struct TwoPairsOneEdgeFrontCase {
     br: (u8, u8),
 }
 
-impl TwoPairsOneEdgeFrontCase {
+impl Case for TwoPairsOneEdgeFrontCase {
     fn from_cube(cube: &Cube) -> Self {
         let mut dfr = (0, 0);
         let mut dlf = (0, 0);
@@ -79,7 +83,7 @@ pub struct TwoPairsOneEdgeBackCase {
     fr: (u8, u8),
 }
 
-impl TwoPairsOneEdgeBackCase {
+impl Case for TwoPairsOneEdgeBackCase {
     fn from_cube(cube: &Cube) -> Self {
         let mut dbl = (0, 0);
         let mut drb = (0, 0);
@@ -123,7 +127,7 @@ pub struct CornerCase {
     drb: (u8, u8),
 }
 
-impl CornerCase {
+impl Case for CornerCase {
     fn from_cube(cube: &Cube) -> Self {
         let mut dfr = (0, 0);
         let mut dlf = (0, 0);
@@ -152,7 +156,7 @@ pub struct EdgeCase {
     br: (u8, u8),
 }
 
-impl EdgeCase {
+impl Case for EdgeCase {
     fn from_cube(cube: &Cube) -> Self {
         let mut fr = (0, 0);
         let mut fl = (0, 0);
@@ -189,18 +193,12 @@ impl Default for Solver {
 
 impl Solver {
     pub fn new() -> Self {
-        let corners = Self::generate_heuristic(CORNER_CASES, CornerCase::from_cube, "F2L/Corners");
-        let edges = Self::generate_heuristic(EDGE_CASES, EdgeCase::from_cube, "F2L/Edges");
-        let two_pairs_front = Self::generate_heuristic(
-            TWO_PAIRS_ONE_EDGE_CASES,
-            TwoPairsOneEdgeFrontCase::from_cube,
-            "F2L/Two Pairs Front",
-        );
-        let two_pairs_back = Self::generate_heuristic(
-            TWO_PAIRS_ONE_EDGE_CASES,
-            TwoPairsOneEdgeBackCase::from_cube,
-            "F2L/Two Pairs Back",
-        );
+        let corners = Self::generate_heuristic(CORNER_CASES, "F2L/Corners");
+        let edges = Self::generate_heuristic(EDGE_CASES, "F2L/Edges");
+        let two_pairs_front =
+            Self::generate_heuristic(TWO_PAIRS_ONE_EDGE_CASES, "F2L/Two Pairs Front");
+        let two_pairs_back =
+            Self::generate_heuristic(TWO_PAIRS_ONE_EDGE_CASES, "F2L/Two Pairs Back");
         Self {
             trigger_algs: Self::generate_trigger_algs(),
             corner_cases: corners,
@@ -247,13 +245,9 @@ impl Solver {
         algs
     }
 
-    fn generate_heuristic<Case>(
-        case_count: usize,
-        case_from_cube: impl Fn(&Cube) -> Case,
-        name: &str,
-    ) -> HashMap<Case, usize>
+    fn generate_heuristic<T>(case_count: usize, name: &str) -> HashMap<T, usize>
     where
-        Case: Eq + Hash + Debug,
+        T: Case,
     {
         let mut cases = HashMap::with_capacity(case_count);
         let mut queue = VecDeque::with_capacity(case_count);
@@ -263,7 +257,7 @@ impl Solver {
             let progress = cases.len();
             print_bfs_progress!(name, progress, case_count);
 
-            let case = case_from_cube(&cube);
+            let case = Case::from_cube(&cube);
             if cases.contains_key(&case) {
                 continue;
             }

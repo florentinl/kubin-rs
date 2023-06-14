@@ -41,6 +41,8 @@ pub fn main() {
         "Average length: {}",
         lengths.iter().sum::<usize>() / lengths.len()
     );
+    println!("Worst time: {}ms", times.iter().max().unwrap());
+    println!("Worst length: {}", lengths.iter().max().unwrap());
 }
 
 fn median<T: Ord + Copy>(v: &mut Vec<T>) -> T {
