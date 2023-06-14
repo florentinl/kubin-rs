@@ -5,8 +5,14 @@ use kubin_rs::{
 
 /// Repl to run the program interactively
 pub fn main() {
+    let number_of_scrambles = std::env::args()
+        .nth(1)
+        .unwrap_or_else(|| "100".to_string())
+        .parse::<usize>()
+        .unwrap();
+
     let mut scrambles = vec![];
-    for _ in 0..1000 {
+    for _ in 0..number_of_scrambles {
         scrambles.push(scramble::generate_scramble());
     }
 
@@ -18,8 +24,8 @@ pub fn main() {
     let mut lengths = vec![];
 
     for (i, scramble) in scrambles.iter().enumerate() {
-        if i % 100 == 0 {
-            println!("{} / {}", i, scrambles.len());
+        if i % (scrambles.len() / 10) == 0 {
+            println!("Solving scrambles: {} / {}", i, scrambles.len());
         }
         let mut cube = cube::Cube::default();
         cube.execute_algorithm(scramble);
