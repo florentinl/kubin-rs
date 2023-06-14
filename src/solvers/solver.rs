@@ -5,7 +5,6 @@ use std::{
 };
 
 use crate::cube::{algorithms::Move, Cube};
-use core::hash::Hash;
 use serde::{Deserialize, Serialize};
 
 pub(super) trait StepSolver: Sized + Serialize + for<'de> Deserialize<'de> {
@@ -39,10 +38,4 @@ pub(super) trait StepSolver: Sized + Serialize + for<'de> Deserialize<'de> {
     fn generate() -> Self;
     /// Solve the step for the given cube
     fn solve(&self, cube: &Cube) -> Vec<Move>;
-}
-
-pub(super) trait Case:
-    PartialEq + Eq + Hash + Serialize + for<'de> Deserialize<'de>
-{
-    fn from_cube(cube: &Cube) -> Self;
 }

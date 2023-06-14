@@ -14,6 +14,12 @@ pub struct Solver {
     pll_solver: pll::Solver,
 }
 
+impl Default for Solver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Solver {
     pub fn new() -> Self {
         Self {

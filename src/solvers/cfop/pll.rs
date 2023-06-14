@@ -6,85 +6,28 @@
 //! For now the lookup table is hardcoded, but in the future I might be able to
 //! generate it programmatically.
 
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
 use crate::{
     cube::{
         algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
-        corner::CornerPiece,
-        edge::EdgePiece,
         Cube,
     },
-    solvers::solver::{Case, StepSolver},
+    solvers::{cube_subsets::CubeSubset, solver::StepSolver},
 };
 
-const PLL_CASES: usize = 22 * 4;
-
-#[derive(PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
-struct PllCase {
-    ur: usize,
-    uf: usize,
-    ul: usize,
-    ub: usize,
-    ufr: usize,
-    ubr: usize,
-    ufl: usize,
-    ulb: usize,
-}
-
-impl Case for PllCase {
-    fn from_cube(cube: &Cube) -> Self {
-        let mut ur = 0;
-        let mut uf = 0;
-        let mut ul = 0;
-        let mut ub = 0;
-        let mut ufr = 0;
-        let mut ubr = 0;
-        let mut ufl = 0;
-        let mut ulb = 0;
-
-        for (i, edge) in cube.edges.iter().enumerate() {
-            match edge.piece {
-                EdgePiece::UR => ur = i,
-                EdgePiece::UF => uf = i,
-                EdgePiece::UL => ul = i,
-                EdgePiece::UB => ub = i,
-                _ => {}
-            }
-        }
-
-        for (i, corner) in cube.corners.iter().enumerate() {
-            match corner.piece {
-                CornerPiece::Urf => ufr = i,
-                CornerPiece::Ubr => ubr = i,
-                CornerPiece::Ufl => ufl = i,
-                CornerPiece::Ulb => ulb = i,
-                _ => {}
-            }
-        }
-
-        Self {
-            ur,
-            uf,
-            ul,
-            ub,
-            ufr,
-            ubr,
-            ufl,
-            ulb,
-        }
-    }
-}
+use crate::solvers::cube_subsets::Pll;
+use crate::solvers::cube_subsets::PLL_CASES;
 
 #[derive(Serialize, Deserialize)]
 pub struct Solver {
-    cases: HashMap<PllCase, Vec<Move>>,
+    cases: HashMap<Pll, Vec<Move>>,
 }
 
 impl Solver {
-    fn get_cases() -> HashMap<PllCase, Vec<Move>> {
+    fn get_cases() -> HashMap<Pll, Vec<Move>> {
         let mut cases = HashMap::with_capacity(PLL_CASES);
 
         let pll_algs = vec![
@@ -116,64 +59,11 @@ impl Solver {
             let alg = parse_algorithm(alg);
             let mut cube = Cube::default();
             cube.execute_algorithm(&invert_algorithm(&alg));
-            let case = PllCase::from_cube(&cube);
-            for case in Self::mirror_cases(&case) {
+            let case = Pll::from_cube(&cube);
+            for case in case.mirror_case() {
                 cases.insert(case, alg.clone());
             }
         }
-
-        cases
-    }
-
-    fn mirror_cases(case: &PllCase) -> Vec<PllCase> {
-        let PllCase {
-            ur,
-            uf,
-            ul,
-            ub,
-            ufr,
-            ubr,
-            ufl,
-            ulb,
-        } = case;
-
-        let mut cases: Vec<PllCase> = vec![case.clone()];
-
-        // U move offset
-        cases.push(PllCase {
-            ur: *ub,
-            uf: *ur,
-            ul: *uf,
-            ub: *ul,
-            ufr: *ubr,
-            ubr: *ulb,
-            ulb: *ufl,
-            ufl: *ufr,
-        });
-
-        // U2 move offset
-        cases.push(PllCase {
-            ur: *ul,
-            uf: *ub,
-            ul: *ur,
-            ub: *uf,
-            ufr: *ulb,
-            ubr: *ufl,
-            ulb: *ufr,
-            ufl: *ubr,
-        });
-
-        // U' move offset
-        cases.push(PllCase {
-            ur: *uf,
-            uf: *ul,
-            ul: *ub,
-            ub: *ur,
-            ufr: *ufl,
-            ubr: *ufr,
-            ulb: *ubr,
-            ufl: *ulb,
-        });
 
         cases
     }
@@ -193,7 +83,7 @@ impl StepSolver for Solver {
         let mut cube = cube.clone();
         for pre_u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
             cube.execute_move(pre_u_move);
-            let case = PllCase::from_cube(&cube);
+            let case = Pll::from_cube(&cube);
             if let Some(alg) = self.cases.get(&case) {
                 cube.execute_algorithm(alg);
                 // Adjust U face

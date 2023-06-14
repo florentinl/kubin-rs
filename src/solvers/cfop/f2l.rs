@@ -6,175 +6,26 @@
 
 use std::{
     collections::{HashMap, VecDeque},
-    hash::Hash,
     io::Write,
 };
 
-use crate::solvers::solver::{Case, StepSolver};
+use crate::solvers::{
+    cube_subsets::{
+        CornerCase, CubeSubset, EdgeCase, TwoPairsOneEdgeBackCase, TwoPairsOneEdgeFrontCase,
+        CORNER_CASES, EDGE_CASES, TWO_PAIRS_ONE_EDGE_CASES,
+    },
+    solver::StepSolver,
+};
 
 use serde::{Deserialize, Serialize};
 
 use crate::{
     cube::{
         algorithms::{self, Move},
-        corner::{self, Corner},
-        edge::{self, Edge},
         Cube,
     },
     solvers::utils::{print_bfs_progress, print_bfs_terminated},
 };
-
-const CORNER_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(3, 4);
-const EDGE_CASES: usize = 8 * 7 * 6 * 5 * usize::pow(2, 4);
-const TWO_PAIRS_ONE_EDGE_CASES: usize = 8 * 7 * 8 * 7 * 6 * usize::pow(3, 2) * usize::pow(2, 3);
-
-#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct TwoPairsOneEdgeFrontCase {
-    dfr: (u8, u8),
-    dlf: (u8, u8),
-    fr: (u8, u8),
-    fl: (u8, u8),
-    br: (u8, u8),
-}
-
-impl Case for TwoPairsOneEdgeFrontCase {
-    fn from_cube(cube: &Cube) -> Self {
-        let mut dfr = (0, 0);
-        let mut dlf = (0, 0);
-
-        for (Corner { piece, orientation }, i) in cube.corners.iter().zip(0..) {
-            match piece {
-                corner::CornerPiece::Dfr => dfr = (i, *orientation),
-                corner::CornerPiece::Dlf => dlf = (i, *orientation),
-                _ => {}
-            }
-        }
-
-        let mut fr = (0, 0);
-        let mut fl = (0, 0);
-        let mut br = (0, 0);
-
-        for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
-            match piece {
-                edge::EdgePiece::FR => fr = (i, *orientation),
-                edge::EdgePiece::FL => fl = (i, *orientation),
-                edge::EdgePiece::BR => br = (i, *orientation),
-                _ => {}
-            }
-        }
-
-        Self {
-            dfr,
-            dlf,
-            fr,
-            fl,
-            br,
-        }
-    }
-}
-
-#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct TwoPairsOneEdgeBackCase {
-    dbl: (u8, u8),
-    drb: (u8, u8),
-    bl: (u8, u8),
-    br: (u8, u8),
-    fr: (u8, u8),
-}
-
-impl Case for TwoPairsOneEdgeBackCase {
-    fn from_cube(cube: &Cube) -> Self {
-        let mut dbl = (0, 0);
-        let mut drb = (0, 0);
-
-        for (Corner { piece, orientation }, i) in cube.corners.iter().zip(0..) {
-            match piece {
-                corner::CornerPiece::Dbl => dbl = (i, *orientation),
-                corner::CornerPiece::Drb => drb = (i, *orientation),
-                _ => {}
-            }
-        }
-
-        let mut bl = (0, 0);
-        let mut br = (0, 0);
-        let mut fr = (0, 0);
-
-        for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
-            match piece {
-                edge::EdgePiece::BL => bl = (i, *orientation),
-                edge::EdgePiece::BR => br = (i, *orientation),
-                edge::EdgePiece::FR => fr = (i, *orientation),
-                _ => {}
-            }
-        }
-
-        Self {
-            dbl,
-            drb,
-            bl,
-            br,
-            fr,
-        }
-    }
-}
-
-#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct CornerCase {
-    dfr: (u8, u8),
-    dlf: (u8, u8),
-    dbl: (u8, u8),
-    drb: (u8, u8),
-}
-
-impl Case for CornerCase {
-    fn from_cube(cube: &Cube) -> Self {
-        let mut dfr = (0, 0);
-        let mut dlf = (0, 0);
-        let mut dbl = (0, 0);
-        let mut drb = (0, 0);
-
-        for (Corner { piece, orientation }, i) in cube.corners.iter().zip(0..) {
-            match piece {
-                corner::CornerPiece::Dfr => dfr = (i, *orientation),
-                corner::CornerPiece::Dlf => dlf = (i, *orientation),
-                corner::CornerPiece::Dbl => dbl = (i, *orientation),
-                corner::CornerPiece::Drb => drb = (i, *orientation),
-                _ => {}
-            }
-        }
-
-        Self { dfr, dlf, dbl, drb }
-    }
-}
-
-#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct EdgeCase {
-    fr: (u8, u8),
-    fl: (u8, u8),
-    bl: (u8, u8),
-    br: (u8, u8),
-}
-
-impl Case for EdgeCase {
-    fn from_cube(cube: &Cube) -> Self {
-        let mut fr = (0, 0);
-        let mut fl = (0, 0);
-        let mut bl = (0, 0);
-        let mut br = (0, 0);
-
-        for (Edge { piece, orientation }, i) in cube.edges.iter().zip(0..) {
-            match piece {
-                edge::EdgePiece::FR => fr = (i, *orientation),
-                edge::EdgePiece::FL => fl = (i, *orientation),
-                edge::EdgePiece::BL => bl = (i, *orientation),
-                edge::EdgePiece::BR => br = (i, *orientation),
-                _ => {}
-            }
-        }
-
-        Self { fr, fl, bl, br }
-    }
-}
 
 #[derive(Serialize, Deserialize)]
 pub struct Solver {
@@ -225,7 +76,7 @@ impl Solver {
 
     fn generate_heuristic<T>(case_count: usize, name: &str) -> HashMap<T, usize>
     where
-        T: Case,
+        T: CubeSubset,
     {
         let mut cases = HashMap::with_capacity(case_count);
         let mut queue = VecDeque::with_capacity(case_count);
@@ -235,7 +86,7 @@ impl Solver {
             let progress = cases.len();
             print_bfs_progress!(name, progress, case_count);
 
-            let case = Case::from_cube(&cube);
+            let case = CubeSubset::from_cube(&cube);
             if cases.contains_key(&case) {
                 continue;
             }

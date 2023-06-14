@@ -6,55 +6,28 @@
 //! For now the lookup table is hardcoded, but in the future I might be able to
 //! generate it programmatically.
 
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
 use crate::{
     cube::{
-        self,
         algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
         Cube,
     },
-    solvers::solver::{Case, StepSolver},
+    solvers::{cube_subsets::CubeSubset, solver::StepSolver},
 };
 
-const OLL_CASES: usize = 58;
-
-#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-struct OllCase {
-    uf: u8,
-    ur: u8,
-    ub: u8,
-    ul: u8,
-    urf: u8,
-    ubr: u8,
-    ulb: u8,
-    ufl: u8,
-}
-
-impl Case for OllCase {
-    fn from_cube(cube: &Cube) -> Self {
-        Self {
-            uf: cube.edges[cube::UF].orientation,
-            ur: cube.edges[cube::UR].orientation,
-            ub: cube.edges[cube::UB].orientation,
-            ul: cube.edges[cube::UL].orientation,
-            urf: cube.corners[cube::URF].orientation,
-            ubr: cube.corners[cube::UBR].orientation,
-            ulb: cube.corners[cube::ULB].orientation,
-            ufl: cube.corners[cube::UFL].orientation,
-        }
-    }
-}
+use crate::solvers::cube_subsets::Oll;
+use crate::solvers::cube_subsets::OLL_CASES;
 
 #[derive(Serialize, Deserialize)]
 pub struct Solver {
-    cases: HashMap<OllCase, Vec<Move>>,
+    cases: HashMap<Oll, Vec<Move>>,
 }
 
 impl Solver {
-    fn get_cases() -> HashMap<OllCase, Vec<Move>> {
+    fn get_cases() -> HashMap<Oll, Vec<Move>> {
         let mut cases = HashMap::with_capacity(OLL_CASES);
 
         let oll_algs = vec![
@@ -122,7 +95,7 @@ impl Solver {
             let alg = parse_algorithm(alg);
             let mut cube = Cube::default();
             cube.execute_algorithm(&invert_algorithm(&alg));
-            let case = OllCase::from_cube(&cube);
+            let case = Oll::from_cube(&cube);
             cases.insert(case, alg);
         }
 
@@ -140,7 +113,7 @@ impl StepSolver for Solver {
         let mut cube = cube.clone();
         for u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
             cube.execute_move(u_move);
-            let case = OllCase::from_cube(&cube);
+            let case = Oll::from_cube(&cube);
             if let Some(alg) = self.cases.get(&case) {
                 if !matches!(u_move, Move::None) {
                     return [u_move.clone()].iter().chain(alg.iter()).cloned().collect();
