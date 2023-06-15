@@ -18,7 +18,8 @@ impl Default for Solver {
 }
 
 impl Solver {
-    #[must_use] pub fn new() -> Self {
+    #[must_use]
+    pub fn new() -> Self {
         Self {
             free_f2l_solver: free_f2l::Solver::new("/tmp/free_f2l_solver.ron"),
             oll_solver: oll::Solver::new("/tmp/oll_solver.ron"),

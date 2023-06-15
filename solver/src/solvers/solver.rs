@@ -9,7 +9,9 @@ use serde::{Deserialize, Serialize};
 
 pub(super) trait Step: Sized + Serialize + for<'de> Deserialize<'de> {
     fn new(path: &str) -> Self {
-        if let Ok(solver) = Self::from_file(path) { solver } else {
+        if let Ok(solver) = Self::from_file(path) {
+            solver
+        } else {
             let solver = Self::generate();
             solver.save_to_file(path).unwrap();
             solver

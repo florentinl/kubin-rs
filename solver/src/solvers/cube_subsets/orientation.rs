@@ -1,10 +1,10 @@
 use cube::{subcases::CubeSubset, Cube};
 use serde::{Deserialize, Serialize};
 
-pub(crate) const EO_CASES: usize = usize::pow(2, 11);
+pub(crate) const ORIENTATION_CASES: usize = usize::pow(3, 7) * usize::pow(2, 11);
 
 #[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub(crate) struct EdgeOrientation {
+pub(crate) struct Orientation {
     uf: u8,
     ur: u8,
     ub: u8,
@@ -17,9 +17,17 @@ pub(crate) struct EdgeOrientation {
     fl: u8,
     br: u8,
     bl: u8,
+    dfr: u8,
+    dlf: u8,
+    dbl: u8,
+    drb: u8,
+    urf: u8,
+    ufl: u8,
+    ulb: u8,
+    ubr: u8,
 }
 
-impl CubeSubset for EdgeOrientation {
+impl CubeSubset for Orientation {
     fn from_cube(cube: &Cube) -> Self {
         Self {
             uf: cube.edges[cube::UF].orientation,
@@ -34,6 +42,14 @@ impl CubeSubset for EdgeOrientation {
             fl: cube.edges[cube::FL].orientation,
             br: cube.edges[cube::BR].orientation,
             bl: cube.edges[cube::BL].orientation,
+            dfr: cube.corners[cube::DFR].orientation,
+            dlf: cube.corners[cube::DLF].orientation,
+            dbl: cube.corners[cube::DBL].orientation,
+            drb: cube.corners[cube::DRB].orientation,
+            urf: cube.corners[cube::URF].orientation,
+            ufl: cube.corners[cube::UFL].orientation,
+            ulb: cube.corners[cube::ULB].orientation,
+            ubr: cube.corners[cube::UBR].orientation,
         }
     }
 }

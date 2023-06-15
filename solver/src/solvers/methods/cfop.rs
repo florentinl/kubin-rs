@@ -19,7 +19,8 @@ impl Default for Solver {
 }
 
 impl Solver {
-    #[must_use] pub fn new() -> Self {
+    #[must_use]
+    pub fn new() -> Self {
         Self {
             cross_solver: cross::Solver::new("/tmp/cross_solver.ron"),
             f2l_solver: f2l::Solver::new("/tmp/f2l_solver.ron"),

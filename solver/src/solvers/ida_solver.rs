@@ -39,12 +39,7 @@ pub(super) trait IDAStepSolver: Step + Default {
         cases
     }
 
-    fn search(
-        &self,
-        cube: &mut Cube,
-        bound: usize,
-        path: &mut Vec<Move>,
-    ) -> usize {
+    fn search(&self, cube: &mut Cube, bound: usize, path: &mut Vec<Move>) -> usize {
         let distance = self.assess_distance(cube);
         let local_lower_bound = path.len() + distance;
         if local_lower_bound > bound {

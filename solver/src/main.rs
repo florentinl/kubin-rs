@@ -45,7 +45,7 @@ pub fn main() {
     let mut handlers = vec![];
 
     for _ in 0..number_of_threads {
-        let solver = solvers::methods::cfop::Solver::new();
+        let solver = solvers::methods::two_phase::Solver::new();
         let method_times = method_times.clone();
         let method_lengths = method_lengths.clone();
         let handler = std::thread::spawn(move || {
@@ -76,8 +76,14 @@ pub fn main() {
         "Average length: {}",
         method_lengths.iter().sum::<usize>() / method_lengths.len()
     );
-    println!("95th percentile time: {}ms", ninety_five_percentile(&mut method_times));
-    println!("95th percentile length: {}", ninety_five_percentile(&mut method_lengths));
+    println!(
+        "95th percentile time: {}ms",
+        ninety_five_percentile(&mut method_times)
+    );
+    println!(
+        "95th percentile length: {}",
+        ninety_five_percentile(&mut method_lengths)
+    );
     println!("Worst time: {}ms", method_times.iter().max().unwrap());
     println!("Worst length: {}", method_lengths.iter().max().unwrap());
 }

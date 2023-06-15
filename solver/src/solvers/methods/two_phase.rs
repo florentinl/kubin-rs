@@ -17,7 +17,8 @@ impl Default for Solver {
 }
 
 impl Solver {
-    #[must_use] pub fn new() -> Self {
+    #[must_use]
+    pub fn new() -> Self {
         Self {
             orientation_solver: orientation::Solver::new("/tmp/orientation_solver.ron"),
             permutation_solver: permutation::Solver::new("/tmp/permutation_solver.ron"),

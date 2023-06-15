@@ -4,17 +4,14 @@ use cube::{algorithms::Move, subcases::CubeSubset};
 use serde::{Deserialize, Serialize};
 
 use crate::solvers::{
-    cube_subsets::{
-        CornerOrientation, EdgeInSlice, EdgeOrientation, CO_CASES, EDGE_IN_SLICE_CASES, EO_CASES,
-    },
+    cube_subsets::{EdgeInSlice, Orientation, EDGE_IN_SLICE_CASES, ORIENTATION_CASES},
     ida_solver::IDAStepSolver,
 };
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct Solver {
     candidate_moves: Vec<Move>,
-    edge_orientation: HashMap<EdgeOrientation, usize>,
-    corner_orientation: HashMap<CornerOrientation, usize>,
+    orientation: HashMap<Orientation, usize>,
     edge_in_slice: HashMap<EdgeInSlice, usize>,
 }
 
@@ -38,15 +35,11 @@ impl IDAStepSolver for Solver {
     }
 
     fn assess_distance(&self, cube: &cube::Cube) -> usize {
-        let edge_orientation = EdgeOrientation::from_cube(cube);
-        let corner_orientation = CornerOrientation::from_cube(cube);
+        let orientation = Orientation::from_cube(cube);
         let edge_in_slice = EdgeInSlice::from_cube(cube);
-        let edge_orientation_moves = self.edge_orientation.get(&edge_orientation).unwrap();
-        let corner_orientation_moves = self.corner_orientation.get(&corner_orientation).unwrap();
+        let orientation_moves = self.orientation.get(&orientation).unwrap();
         let edge_in_slice_moves = self.edge_in_slice.get(&edge_in_slice).unwrap();
-        *edge_orientation_moves
-            .max(corner_orientation_moves)
-            .max(edge_in_slice_moves)
+        *orientation_moves.max(edge_in_slice_moves)
     }
 
     fn populate_candidate_moves(&mut self) {
@@ -54,8 +47,7 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_heuristics(&mut self) {
-        self.edge_orientation = self.generate_heuristic(EO_CASES, "Orientation/EO");
-        self.corner_orientation = self.generate_heuristic(CO_CASES, "Orientation/CO");
+        self.orientation = self.generate_heuristic(ORIENTATION_CASES, "Orientation/EO");
         self.edge_in_slice = self.generate_heuristic(EDGE_IN_SLICE_CASES, "Orientation/EIS");
     }
 }

@@ -8,8 +8,8 @@ use std::collections::HashMap;
 
 use crate::solvers::{
     cube_subsets::{
-        Cross,
-        CROSS_CASES, FrontLeftBlock, FrontRightBlock, BackLeftBlock, BackRightBlock, BLOCK_CASES,
+        BackLeftBlock, BackRightBlock, Cross, FrontLeftBlock, FrontRightBlock, BLOCK_CASES,
+        CROSS_CASES,
     },
     ida_solver::IDAStepSolver,
 };
