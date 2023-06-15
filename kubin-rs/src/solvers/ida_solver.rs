@@ -3,11 +3,17 @@ use cube::{algorithms::Move, Cube};
 use super::solver::StepSolver;
 
 pub(super) trait IDAStepSolver: StepSolver + Default {
-    fn get_candidate_moves(&self, previous_move: Option<&Vec<Move>>) -> Vec<Vec<Move>>;
+    fn get_candidate_moves(&self, history: &Vec<Vec<Move>>) -> Vec<Vec<Move>>;
     fn assess_distance(&self, cube: &Cube) -> usize;
     fn populate_candidate_moves(&mut self);
     fn populate_heuristics(&mut self);
-    fn search(&self, cube: &mut Cube, bound: usize, path: &mut Vec<Move>, previous: Option<&Vec<Move>>) -> usize {
+    fn search(
+        &self,
+        cube: &mut Cube,
+        bound: usize,
+        path: &mut Vec<Move>,
+        history: Vec<Vec<Move>>,
+    ) -> usize {
         let distance = self.assess_distance(cube);
         let local_lower_bound = path.len() + distance;
         if local_lower_bound > bound {
@@ -18,11 +24,13 @@ pub(super) trait IDAStepSolver: StepSolver + Default {
         }
         let mut min = usize::MAX;
 
-        for alg in self.get_candidate_moves(previous) {
+        for alg in self.get_candidate_moves(&history) {
             let mut cube = cube.clone();
             cube.execute_algorithm(&alg);
             path.extend(alg.iter().cloned());
-            let t = self.search(&mut cube, bound, path, Some(&alg));
+            let mut history = history.clone();
+            history.push(alg.clone());
+            let t = self.search(&mut cube, bound, path, Vec::new());
             if t == 0 {
                 return 0;
             }
@@ -50,7 +58,7 @@ impl<T: IDAStepSolver> StepSolver for T {
         let mut bound = self.assess_distance(&cube);
         let mut path = vec![];
         loop {
-            let t = self.search(&mut cube, bound, &mut path, None);
+            let t = self.search(&mut cube, bound, &mut path, Vec::new());
             if t == 0 {
                 return path.iter().filter(|x| **x != Move::None).cloned().collect();
             }

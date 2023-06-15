@@ -94,6 +94,7 @@ impl StepSolver for Solver {
                             .iter()
                             .chain(alg.iter())
                             .chain([post_u_move.clone()].iter())
+                            .filter(|m| **m != Move::None)
                             .cloned()
                             .collect::<Vec<Move>>();
 

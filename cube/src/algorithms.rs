@@ -23,6 +23,32 @@ pub enum Move {
     None,
 }
 
+impl Move {
+    pub fn same_face_moves(&self) -> Vec<Move> {
+        match self {
+            Move::U | Move::U2 | Move::Up => vec![Move::U, Move::U2, Move::Up],
+            Move::D | Move::D2 | Move::Dp => vec![Move::D, Move::D2, Move::Dp],
+            Move::F | Move::F2 | Move::Fp => vec![Move::F, Move::F2, Move::Fp],
+            Move::B | Move::B2 | Move::Bp => vec![Move::B, Move::B2, Move::Bp],
+            Move::R | Move::R2 | Move::Rp => vec![Move::R, Move::R2, Move::Rp],
+            Move::L | Move::L2 | Move::Lp => vec![Move::L, Move::L2, Move::Lp],
+            Move::None => vec![Move::None],
+        }
+    }
+
+    pub fn opposite_face_moves(&self) -> Vec<Move> {
+        match self {
+            Move::U | Move::U2 | Move::Up => vec![Move::D, Move::D2, Move::Dp],
+            Move::D | Move::D2 | Move::Dp => vec![Move::U, Move::U2, Move::Up],
+            Move::F | Move::F2 | Move::Fp => vec![Move::B, Move::B2, Move::Bp],
+            Move::B | Move::B2 | Move::Bp => vec![Move::F, Move::F2, Move::Fp],
+            Move::R | Move::R2 | Move::Rp => vec![Move::L, Move::L2, Move::Lp],
+            Move::L | Move::L2 | Move::Lp => vec![Move::R, Move::R2, Move::Rp],
+            Move::None => vec![Move::None],
+        }
+    }
+}
+
 impl ToString for Move {
     fn to_string(&self) -> String {
         match self {
@@ -70,7 +96,6 @@ pub const ALL_MOVES: [Move; 18] = [
     Move::Lp,
 ];
 
-#[must_use]
 pub fn invert_move(move_: &Move) -> Move {
     match move_ {
         Move::U => Move::Up,

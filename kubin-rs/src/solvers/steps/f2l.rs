@@ -34,7 +34,7 @@ pub struct Solver {
 }
 
 impl IDAStepSolver for Solver {
-    fn get_candidate_moves(&self, _previous_move: Option<&Vec<Move>>) -> Vec<Vec<Move>> {
+    fn get_candidate_moves(&self,  _history: &Vec<Vec<Move>>) -> Vec<Vec<Move>> {
         self.candidate_moves.clone()
     }
 
