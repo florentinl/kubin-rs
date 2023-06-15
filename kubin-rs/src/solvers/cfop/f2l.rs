@@ -11,20 +11,22 @@ use std::{
 
 use crate::solvers::{
     cube_subsets::{
-        Corners, Edges, TwoBackPairsOneEdge, TwoFrontPairsOneEdge, CORNER_CASES,
-        EDGE_CASES, TWO_PAIRS_ONE_EDGE_CASES,
+        Corners, Edges, TwoBackPairsOneEdge, TwoFrontPairsOneEdge, CORNER_CASES, EDGE_CASES,
+        TWO_PAIRS_ONE_EDGE_CASES,
     },
     solver::StepSolver,
 };
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    solvers::utils::{print_bfs_progress, print_bfs_terminated},
-};
+use crate::solvers::utils::{print_bfs_progress, print_bfs_terminated};
 
-use cube::{self, algorithms::{Move, self}, Cube};
 use cube::subcases::CubeSubset;
+use cube::{
+    self,
+    algorithms::{self, Move},
+    Cube,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct Solver {

@@ -11,8 +11,8 @@ use std::{
 use crate::solvers::{
     cube_subsets::Cross, cube_subsets::CROSS_CASES, solver::StepSolver, utils::print_bfs_progress,
 };
-use cube::{self, algorithms::Move, Cube};
 use cube::subcases::CubeSubset;
+use cube::{self, algorithms::Move, Cube};
 use serde::{Deserialize, Serialize};
 
 use crate::solvers::utils::print_bfs_terminated;
