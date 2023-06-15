@@ -68,7 +68,7 @@ impl IDAStepSolver for Solver {
         let back_left_block = BackLeftBlock::from_cube(cube);
         let back_right_block = BackRightBlock::from_cube(cube);
 
-        let cross_distance = *self.cross_cases.get(&cross).unwrap() * 2;
+        let cross_distance = *self.cross_cases.get(&cross).unwrap();
         let front_left_block_distance = self.front_left_block.get(&front_left_block).unwrap();
         let front_right_block_distance = self.front_right_block.get(&front_right_block).unwrap();
         let back_left_block_distance = self.back_left_block.get(&back_left_block).unwrap();

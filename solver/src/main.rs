@@ -95,8 +95,8 @@ fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<u128>, Vec<usiz
         let solution = solver.solve(&cube);
         let elapsed = now.elapsed();
 
-        println!("Scramble: {}", cube::algorithms::algorithm_to_string(&scramble));
-        println!("Solution: {}", cube::algorithms::algorithm_to_string(&solution));
+        // println!("Scramble: {}", cube::algorithms::algorithm_to_string(&scramble));
+        // println!("Solution: {}", cube::algorithms::algorithm_to_string(&solution));
 
         times.push(elapsed.as_millis());
         lengths.push(solution.len());
