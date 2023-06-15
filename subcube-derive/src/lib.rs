@@ -29,15 +29,15 @@ fn parse_piece_name(name: &Ident) -> (String, PieceType, PieceInfo) {
     let piece_type;
     let mut piece_info = None;
     // If the name contains and underscore, we know it's a position-only or orientation-only piece
-    if name.contains("_") {
-        let mut split = name.split("_");
+    if name.contains('_') {
+        let mut split = name.split('_');
         piece_name = split.next().unwrap().to_string();
         piece_info = split.next();
     }
 
-    if EDGE_NAMES.contains(&piece_name.to_string().as_str()) {
+    if EDGE_NAMES.contains(&piece_name.as_str()) {
         piece_type = PieceType::Edge;
-    } else if CORNER_NAMES.contains(&piece_name.to_string().as_str()) {
+    } else if CORNER_NAMES.contains(&piece_name.as_str()) {
         piece_type = PieceType::Corner;
     } else {
         panic!("Invalid piece name");

@@ -48,26 +48,11 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_heuristics(&mut self) {
-        self.front_left_block = generate_heuristic(
-            BLOCK_CASES,
-            "FreeF2L/FLB",
-            &self.get_candidate_moves(&vec![]),
-        );
-        self.front_right_block = generate_heuristic(
-            BLOCK_CASES,
-            "FreeF2L/FRB",
-            &self.get_candidate_moves(&vec![]),
-        );
-        self.back_left_block = generate_heuristic(
-            BLOCK_CASES,
-            "FreeF2L/BLB",
-            &self.get_candidate_moves(&vec![]),
-        );
-        self.back_right_block = generate_heuristic(
-            BLOCK_CASES,
-            "FreeF2L/BRB",
-            &self.get_candidate_moves(&vec![]),
-        );
+        let candidate_moves = &self.get_candidate_moves(&[]);
+        self.front_left_block = generate_heuristic(BLOCK_CASES, "FreeF2L/FLB", candidate_moves);
+        self.front_right_block = generate_heuristic(BLOCK_CASES, "FreeF2L/FRB", candidate_moves);
+        self.back_left_block = generate_heuristic(BLOCK_CASES, "FreeF2L/BLB", candidate_moves);
+        self.back_right_block = generate_heuristic(BLOCK_CASES, "FreeF2L/BRB", candidate_moves);
     }
 
     fn assess_distance(&self, cube: &cube::Cube) -> usize {
