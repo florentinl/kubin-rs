@@ -39,8 +39,8 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_candidate_moves(&mut self) {
-        for pre_u_move in [Move::U, Move::Up, Move::U2, Move::None].iter() {
-            for move_ in [
+        for pre_u_move in &[Move::U, Move::Up, Move::U2, Move::None] {
+            for move_ in &[
                 Move::R,
                 Move::Rp,
                 Move::L,
@@ -50,9 +50,8 @@ impl IDAStepSolver for Solver {
                 Move::B,
                 Move::Bp,
             ]
-            .iter()
             {
-                for u_move in [Move::U, Move::Up, Move::U2].iter() {
+                for u_move in &[Move::U, Move::Up, Move::U2] {
                     let alg = if matches!(pre_u_move, Move::None) {
                         vec![
                             move_.clone(),
@@ -110,7 +109,7 @@ impl IDAStepSolver for Solver {
 
 #[cfg(test)]
 mod tests {
-    use crate::solvers::solver::StepSolver;
+    use crate::solvers::solver::Step;
 
     use super::*;
 

@@ -24,7 +24,7 @@ pub enum Move {
 }
 
 impl Move {
-    pub fn same_face_moves(&self) -> Vec<Move> {
+    #[must_use] pub fn same_face_moves(&self) -> Vec<Move> {
         match self {
             Move::U | Move::U2 | Move::Up => vec![Move::U, Move::U2, Move::Up],
             Move::D | Move::D2 | Move::Dp => vec![Move::D, Move::D2, Move::Dp],
@@ -36,7 +36,7 @@ impl Move {
         }
     }
 
-    pub fn opposite_face_moves(&self) -> Vec<Move> {
+    #[must_use] pub fn opposite_face_moves(&self) -> Vec<Move> {
         match self {
             Move::U | Move::U2 | Move::Up => vec![Move::D, Move::D2, Move::Dp],
             Move::D | Move::D2 | Move::Dp => vec![Move::U, Move::U2, Move::Up],
@@ -70,7 +70,7 @@ impl ToString for Move {
             Move::L => "L".to_string(),
             Move::L2 => "L2".to_string(),
             Move::Lp => "L'".to_string(),
-            Move::None => "".to_string(),
+            Move::None => String::new(),
         }
     }
 }
@@ -96,7 +96,7 @@ pub const ALL_MOVES: [Move; 18] = [
     Move::Lp,
 ];
 
-pub fn invert_move(move_: &Move) -> Move {
+#[must_use] pub fn invert_move(move_: &Move) -> Move {
     match move_ {
         Move::U => Move::Up,
         Move::U2 => Move::U2,
@@ -120,7 +120,7 @@ pub fn invert_move(move_: &Move) -> Move {
     }
 }
 
-pub fn invert_algorithm(algorithm: &[Move]) -> Vec<Move> {
+#[must_use] pub fn invert_algorithm(algorithm: &[Move]) -> Vec<Move> {
     let mut inverted_algorithm = Vec::with_capacity(algorithm.len());
     for move_ in algorithm.iter().rev() {
         inverted_algorithm.push(invert_move(move_));
@@ -128,7 +128,7 @@ pub fn invert_algorithm(algorithm: &[Move]) -> Vec<Move> {
     inverted_algorithm
 }
 
-pub fn parse_algorithm(algorithm: &str) -> Vec<Move> {
+#[must_use] pub fn parse_algorithm(algorithm: &str) -> Vec<Move> {
     let mut parsed_algorithm = Vec::with_capacity(algorithm.len());
     let mut chars = algorithm.chars();
     while let Some(c) = chars.next() {
@@ -169,9 +169,9 @@ pub fn parse_algorithm(algorithm: &str) -> Vec<Move> {
     parsed_algorithm
 }
 
-pub fn algorithm_to_string(alg: &[Move]) -> String {
+#[must_use] pub fn algorithm_to_string(alg: &[Move]) -> String {
     alg.iter()
-        .map(|m| m.to_string())
+        .map(std::string::ToString::to_string)
         .collect::<Vec<String>>()
         .join(" ")
 }

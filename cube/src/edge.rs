@@ -1,11 +1,11 @@
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Edge {
-    pub piece: EdgePiece,
+    pub piece: Piece,
     pub orientation: u8,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum EdgePiece {
+pub enum Piece {
     UR,
     UF,
     UL,
@@ -21,7 +21,7 @@ pub enum EdgePiece {
 }
 
 impl Edge {
-    pub(super) fn new(piece: EdgePiece, orientation: u8) -> Self {
+    pub(super) fn new(piece: Piece, orientation: u8) -> Self {
         Self { piece, orientation }
     }
 

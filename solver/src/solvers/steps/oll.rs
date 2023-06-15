@@ -10,7 +10,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::solvers::solver::StepSolver;
+use crate::solvers::solver::Step;
 
 use cube::{
     algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
@@ -103,7 +103,7 @@ impl Solver {
     }
 }
 
-impl StepSolver for Solver {
+impl Step for Solver {
     fn generate() -> Self {
         let cases = Self::get_cases();
         Self { cases }
@@ -111,15 +111,14 @@ impl StepSolver for Solver {
 
     fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
-        for u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
+        for u_move in &[Move::None, Move::U, Move::U2, Move::Up] {
             cube.execute_move(u_move);
             let case = Oll::from_cube(&cube);
             if let Some(alg) = self.cases.get(&case) {
                 if !matches!(u_move, Move::None) {
                     return [u_move.clone()].iter().chain(alg.iter()).cloned().collect();
-                } else {
-                    return alg.clone();
                 }
+                return alg.clone();
             }
             cube.execute_move(&invert_move(u_move));
         }

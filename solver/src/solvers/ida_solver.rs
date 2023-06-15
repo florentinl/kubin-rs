@@ -1,8 +1,8 @@
 use cube::{algorithms::Move, Cube};
 
-use super::solver::StepSolver;
+use super::solver::Step;
 
-pub(super) trait IDAStepSolver: StepSolver + Default {
+pub(super) trait IDAStepSolver: Step + Default {
     fn get_candidate_moves(&self, history: &[Vec<Move>]) -> Vec<Vec<Move>>;
     fn assess_distance(&self, cube: &Cube) -> usize;
     fn populate_candidate_moves(&mut self);
@@ -45,7 +45,7 @@ pub(super) trait IDAStepSolver: StepSolver + Default {
     }
 }
 
-impl<T: IDAStepSolver> StepSolver for T {
+impl<T: IDAStepSolver> Step for T {
     fn generate() -> Self {
         let mut solver = Self::default();
         solver.populate_candidate_moves();

@@ -9,7 +9,7 @@ use std::{
 };
 
 use crate::solvers::{
-    cube_subsets::Cross, cube_subsets::CROSS_CASES, solver::StepSolver, utils::print_bfs_progress,
+    cube_subsets::Cross, cube_subsets::CROSS_CASES, solver::Step, utils::print_bfs_progress,
 };
 use cube::subcases::CubeSubset;
 use cube::{self, algorithms::Move, Cube};
@@ -52,7 +52,7 @@ impl Solver {
     }
 }
 
-impl StepSolver for Solver {
+impl Step for Solver {
     fn generate() -> Self {
         let mut cross_solver = Self {
             cases: HashMap::with_capacity(CROSS_CASES),

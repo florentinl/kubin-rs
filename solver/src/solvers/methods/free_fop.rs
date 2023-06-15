@@ -1,7 +1,7 @@
 use cube::{algorithms::Move, Cube};
 
 use crate::solvers::{
-    solver::{MethodSolver, StepSolver},
+    solver::{Method, Step},
     steps::{free_f2l, oll, pll},
 };
 
@@ -18,7 +18,7 @@ impl Default for Solver {
 }
 
 impl Solver {
-    pub fn new() -> Self {
+    #[must_use] pub fn new() -> Self {
         Self {
             free_f2l_solver: free_f2l::Solver::new("/tmp/free_f2l_solver.ron"),
             oll_solver: oll::Solver::new("/tmp/oll_solver.ron"),
@@ -27,7 +27,7 @@ impl Solver {
     }
 }
 
-impl MethodSolver for Solver {
+impl Method for Solver {
     fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
 

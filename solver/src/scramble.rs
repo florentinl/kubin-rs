@@ -1,6 +1,6 @@
 use cube::algorithms::{self, Move};
 
-pub fn generate_scramble() -> Vec<Move> {
+#[must_use] pub fn generate() -> Vec<Move> {
     let mut scramble = Vec::with_capacity(20);
 
     for _ in 0..20 {

@@ -7,15 +7,12 @@ use std::{
 use cube::{algorithms::Move, Cube};
 use serde::{Deserialize, Serialize};
 
-pub(super) trait StepSolver: Sized + Serialize + for<'de> Deserialize<'de> {
+pub(super) trait Step: Sized + Serialize + for<'de> Deserialize<'de> {
     fn new(path: &str) -> Self {
-        match Self::from_file(path) {
-            Ok(solver) => solver,
-            Err(_) => {
-                let solver = Self::generate();
-                solver.save_to_file(path).unwrap();
-                solver
-            }
+        if let Ok(solver) = Self::from_file(path) { solver } else {
+            let solver = Self::generate();
+            solver.save_to_file(path).unwrap();
+            solver
         }
     }
     fn save_to_file(&self, path: &str) -> Result<(), Box<dyn Error>> {
@@ -40,6 +37,6 @@ pub(super) trait StepSolver: Sized + Serialize + for<'de> Deserialize<'de> {
     fn solve(&self, cube: &Cube) -> Vec<Move>;
 }
 
-pub trait MethodSolver {
+pub trait Method {
     fn solve(&self, cube: &Cube) -> Vec<Move>;
 }

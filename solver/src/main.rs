@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use solver::{
     scramble,
-    solvers::{self, solver::MethodSolver},
+    solvers::{self, solver::Method},
 };
 
 use cube::{self};
@@ -34,8 +34,8 @@ pub fn main() {
         },
     );
 
-    println!("Solving {} scrambles", number_of_scrambles);
-    println!("Using {} threads", number_of_threads);
+    println!("Solving {number_of_scrambles} scrambles");
+    println!("Using {number_of_threads} threads");
 
     let scrambles_per_thread = number_of_scrambles / number_of_threads;
 
@@ -49,7 +49,7 @@ pub fn main() {
         let method_times = method_times.clone();
         let method_lengths = method_lengths.clone();
         let handler = std::thread::spawn(move || {
-            let (times, lengths) = solve_n_scrambles(scrambles_per_thread, solver);
+            let (times, lengths) = solve_n_scrambles(scrambles_per_thread, &solver);
             method_times.lock().unwrap().extend(times);
             method_lengths.lock().unwrap().extend(lengths);
         });
@@ -69,7 +69,7 @@ pub fn main() {
     println!("Median time: {}ms", median(&mut method_times));
     println!(
         "Average time: {}ms",
-        method_times.iter().sum::<u16>() / method_times.len() as u16
+        method_times.iter().sum::<u128>() / method_times.len() as u128
     );
     println!("Median length: {}", median(&mut method_lengths));
     println!(
@@ -80,12 +80,12 @@ pub fn main() {
     println!("Worst length: {}", method_lengths.iter().max().unwrap());
 }
 
-fn solve_n_scrambles(count: usize, solver: impl MethodSolver) -> (Vec<u16>, Vec<usize>) {
+fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<u128>, Vec<usize>) {
     let mut times = vec![];
     let mut lengths = vec![];
 
     for _ in 0..count {
-        let scramble = scramble::generate_scramble();
+        let scramble = scramble::generate();
         let mut cube = cube::Cube::default();
         cube.execute_algorithm(&scramble);
 
@@ -93,7 +93,7 @@ fn solve_n_scrambles(count: usize, solver: impl MethodSolver) -> (Vec<u16>, Vec<
         let solution = solver.solve(&cube);
         let elapsed = now.elapsed();
 
-        times.push(elapsed.as_millis() as u16);
+        times.push(elapsed.as_millis());
         lengths.push(solution.len());
     }
 

@@ -1,7 +1,7 @@
 use cube::{algorithms::Move, Cube};
 
 use crate::solvers::{
-    solver::{MethodSolver, StepSolver},
+    solver::{Method, Step},
     steps::{orientation, permutation},
 };
 
@@ -17,7 +17,7 @@ impl Default for Solver {
 }
 
 impl Solver {
-    pub fn new() -> Self {
+    #[must_use] pub fn new() -> Self {
         Self {
             orientation_solver: orientation::Solver::new("/tmp/orientation_solver.ron"),
             permutation_solver: permutation::Solver::new("/tmp/permutation_solver.ron"),
@@ -25,7 +25,7 @@ impl Solver {
     }
 }
 
-impl MethodSolver for Solver {
+impl Method for Solver {
     fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
 

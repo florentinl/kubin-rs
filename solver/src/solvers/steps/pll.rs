@@ -10,7 +10,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::solvers::solver::StepSolver;
+use crate::solvers::solver::Step;
 
 use cube::{
     algorithms::{invert_algorithm, invert_move, parse_algorithm, Move},
@@ -68,12 +68,12 @@ impl Solver {
         cases
     }
 
-    fn is_solved(&self, cube: &Cube) -> bool {
+    fn is_solved(cube: &Cube) -> bool {
         *cube == Cube::default()
     }
 }
 
-impl StepSolver for Solver {
+impl Step for Solver {
     fn generate() -> Self {
         let cases = Self::get_cases();
         Self { cases }
@@ -81,7 +81,7 @@ impl StepSolver for Solver {
 
     fn solve(&self, cube: &Cube) -> Vec<Move> {
         let mut cube = cube.clone();
-        for pre_u_move in [Move::None, Move::U, Move::U2, Move::Up].iter() {
+        for pre_u_move in &[Move::None, Move::U, Move::U2, Move::Up] {
             cube.execute_move(pre_u_move);
             let case = Pll::from_cube(&cube);
             if let Some(alg) = self.cases.get(&case) {
@@ -89,7 +89,7 @@ impl StepSolver for Solver {
                 // Adjust U face
                 for post_u_move in [Move::None, Move::U, Move::U2, Move::Up] {
                     cube.execute_move(&post_u_move);
-                    if self.is_solved(&cube) {
+                    if Self::is_solved(&cube) {
                         let solution = [pre_u_move.clone()]
                             .iter()
                             .chain(alg.iter())

@@ -1,11 +1,11 @@
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Corner {
-    pub piece: CornerPiece,
+    pub piece: Piece,
     pub orientation: u8,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum CornerPiece {
+pub enum Piece {
     Urf,
     Ufl,
     Ulb,
@@ -17,7 +17,7 @@ pub enum CornerPiece {
 }
 
 impl Corner {
-    pub(super) fn new(piece: CornerPiece, orientation: u8) -> Self {
+    pub(super) fn new(piece: Piece, orientation: u8) -> Self {
         Self { piece, orientation }
     }
 

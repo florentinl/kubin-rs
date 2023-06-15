@@ -52,6 +52,8 @@ fn parse_piece_name(name: &Ident) -> (String, PieceType, PieceInfo) {
 }
 
 #[proc_macro_derive(CubeSubset)]
+/// # Panics
+/// Panics if the struct does not contain valid field names.
 pub fn cube_subset_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     // Ensure that the type is a struct
@@ -60,9 +62,8 @@ pub fn cube_subset_derive(input: TokenStream) -> TokenStream {
         let mut edges = Vec::new();
         let mut corners = Vec::new();
         for field in data.fields {
-            let name = match field.ident {
-                Some(name) => name,
-                None => panic!("CubeSubset can only be derived for named structs"),
+            let Some(name) = field.ident else {
+                panic!("CubeSubset can only be derived for named structs");
             };
 
             let (piece_name, piece_type, piece_info) = parse_piece_name(&name);
@@ -128,13 +129,13 @@ fn edge_extraction(edges: &[(Ident, String, PieceInfo)]) -> proc_macro2::TokenSt
             let piece_name = Ident::new(&(piece_name.to_uppercase()), name.span());
             match piece_info {
                 PieceInfo::PositionAndOrientation => {
-                    quote! { cube::edge::EdgePiece::#piece_name => #name = (i, *orientation), }
+                    quote! { cube::edge::Piece::#piece_name => #name = (i, *orientation), }
                 }
                 PieceInfo::PositionOnly => {
-                    quote! { cube::edge::EdgePiece::#piece_name => #name = i, }
+                    quote! { cube::edge::Piece::#piece_name => #name = i, }
                 }
                 PieceInfo::OrientationOnly => {
-                    quote! { cube::edge::EdgePiece::#piece_name => #name = *orientation, }
+                    quote! { cube::edge::Piece::#piece_name => #name = *orientation, }
                 }
             }
         })
@@ -154,18 +155,18 @@ fn corner_extraction(corners: &[(Ident, String, PieceInfo)]) -> proc_macro2::Tok
         .iter()
         .map(|(name, piece_name, piece_info)| {
             let piece_name = Ident::new(
-                &(to_first_letter_uppercase(piece_name.to_string())),
+                &(to_first_letter_uppercase(&piece_name.to_string())),
                 name.span(),
             );
             match piece_info {
                 PieceInfo::PositionAndOrientation => quote! {
-                    cube::corner::CornerPiece::#piece_name => #name = (i, *orientation),
+                    cube::corner::Piece::#piece_name => #name = (i, *orientation),
                 },
                 PieceInfo::PositionOnly => {
-                    quote! { cube::corner::CornerPiece::#piece_name => #name = i, }
+                    quote! { cube::corner::Piece::#piece_name => #name = i, }
                 }
                 PieceInfo::OrientationOnly => {
-                    quote! { cube::corner::CornerPiece::#piece_name => #name = *orientation, }
+                    quote! { cube::corner::Piece::#piece_name => #name = *orientation, }
                 }
             }
         })
@@ -180,6 +181,6 @@ fn corner_extraction(corners: &[(Ident, String, PieceInfo)]) -> proc_macro2::Tok
     }
 }
 
-fn to_first_letter_uppercase(s: String) -> String {
+fn to_first_letter_uppercase(s: &str) -> String {
     s[0..1].to_uppercase() + &s[1..]
 }

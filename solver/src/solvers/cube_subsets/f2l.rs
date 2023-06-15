@@ -4,7 +4,7 @@ use cube::subcases::CubeSubset;
 
 use cube_macros::CubeSubset;
 
-pub(crate) const TWO_PAIRS_ONE_EDGE_CASES: usize = 1354752; // (8 * 7 * 3²) * (8 * 7 * 6 * 2³);
+pub(crate) const TWO_PAIRS_ONE_EDGE_CASES: usize = 1_354_752; // (8 * 7 * 3²) * (8 * 7 * 6 * 2³);
 
 #[derive(PartialEq, Eq, Hash, Serialize, Deserialize, CubeSubset)]
 pub struct TwoFrontPairsOneEdge {
