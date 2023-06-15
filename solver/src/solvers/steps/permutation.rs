@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use crate::solvers::{
     cube_subsets::{CornerPermutation, EdgePermutation, CP_CASES, EP_CASES},
     ida_solver::IDAStepSolver,
-    utils::generate_heuristic,
 };
 
 #[derive(Serialize, Deserialize, Default)]
@@ -61,9 +60,7 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_heuristics(&mut self) {
-        let candidate_moves = &self.get_candidate_moves(&[]);
-        self.corner_permutation =
-            generate_heuristic(CP_CASES, "Permutation/Corner", candidate_moves);
-        self.edge_permutation = generate_heuristic(EP_CASES, "Permutation/Edge", candidate_moves);
+        self.corner_permutation = self.generate_heuristic(CP_CASES, "Permutation/Corner");
+        self.edge_permutation = self.generate_heuristic(EP_CASES, "Permutation/Edge");
     }
 }

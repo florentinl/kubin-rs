@@ -12,7 +12,6 @@ use crate::solvers::{
         TWO_PAIRS_ONE_EDGE_CASES,
     },
     ida_solver::IDAStepSolver,
-    utils::generate_heuristic,
 };
 
 use serde::{Deserialize, Serialize};
@@ -73,17 +72,15 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_heuristics(&mut self) {
-        self.corner_cases = generate_heuristic(CORNER_CASES, "F2L/Corners", &self.candidate_moves);
-        self.edge_cases = generate_heuristic(EDGE_CASES, "F2L/Edges", &self.candidate_moves);
-        self.two_front_pairs_cases = generate_heuristic(
+        self.corner_cases = self.generate_heuristic(CORNER_CASES, "F2L/Corners");
+        self.edge_cases = self.generate_heuristic(EDGE_CASES, "F2L/Edges");
+        self.two_front_pairs_cases = self.generate_heuristic(
             TWO_PAIRS_ONE_EDGE_CASES,
             "F2L/TwoFrontPairsOneEdge",
-            &self.candidate_moves,
         );
-        self.two_back_pairs_cases = generate_heuristic(
+        self.two_back_pairs_cases = self.generate_heuristic(
             TWO_PAIRS_ONE_EDGE_CASES,
             "F2L/TwoBackPairsOneEdge",
-            &self.candidate_moves,
         );
     }
 

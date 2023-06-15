@@ -8,7 +8,6 @@ use crate::solvers::{
         CornerOrientation, EdgeInSlice, EdgeOrientation, CO_CASES, EDGE_IN_SLICE_CASES, EO_CASES,
     },
     ida_solver::IDAStepSolver,
-    utils::generate_heuristic,
 };
 
 #[derive(Serialize, Deserialize, Default)]
@@ -58,10 +57,8 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_heuristics(&mut self) {
-        let candidate_moves = &self.get_candidate_moves(&[]);
-        self.edge_orientation = generate_heuristic(EO_CASES, "Orientation/EO", candidate_moves);
-        self.corner_orientation = generate_heuristic(CO_CASES, "Orientation/CO", candidate_moves);
-        self.edge_in_slice =
-            generate_heuristic(EDGE_IN_SLICE_CASES, "Orientation/EIS", candidate_moves);
+        self.edge_orientation = self.generate_heuristic(EO_CASES, "Orientation/EO");
+        self.corner_orientation = self.generate_heuristic(CO_CASES, "Orientation/CO");
+        self.edge_in_slice = self.generate_heuristic(EDGE_IN_SLICE_CASES, "Orientation/EIS");
     }
 }

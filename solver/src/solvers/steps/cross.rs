@@ -9,13 +9,13 @@ use std::{
 };
 
 use crate::solvers::{
-    cube_subsets::Cross, cube_subsets::CROSS_CASES, solver::Step, utils::print_bfs_progress,
+    cube_subsets::Cross, cube_subsets::CROSS_CASES, solver::Step, utils::print_progress,
 };
 use cube::subcases::CubeSubset;
 use cube::{self, algorithms::Move, Cube};
 use serde::{Deserialize, Serialize};
 
-use crate::solvers::utils::print_bfs_terminated;
+use crate::solvers::utils::print_terminated;
 
 #[derive(Serialize, Deserialize)]
 pub struct Solver {
@@ -30,7 +30,12 @@ impl Solver {
 
         while let Some((cube, solution)) = queue.pop_front() {
             let progress = self.cases.len();
-            print_bfs_progress!("Cross", progress, CROSS_CASES);
+            print_progress!(
+                "Generating lookup table for",
+                "Cross",
+                progress,
+                CROSS_CASES
+            );
 
             let case = Cross::from_cube(&cube);
             if self.cases.contains_key(&case) {
@@ -48,7 +53,12 @@ impl Solver {
                 queue.push_back((cube, solution));
             }
         }
-        print_bfs_terminated!("Cross", self.cases.len(), CROSS_CASES);
+        print_terminated!(
+            "Generating lookup table for",
+            "Cross",
+            self.cases.len(),
+            CROSS_CASES
+        );
     }
 }
 

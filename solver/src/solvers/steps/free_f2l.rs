@@ -9,7 +9,6 @@ use crate::solvers::cube_subsets::BLOCK_CASES;
 use crate::solvers::{
     cube_subsets::{BackLeftBlock, BackRightBlock, FrontLeftBlock, FrontRightBlock},
     ida_solver::IDAStepSolver,
-    utils::generate_heuristic,
 };
 
 #[derive(Serialize, Deserialize, Default)]
@@ -48,11 +47,10 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_heuristics(&mut self) {
-        let candidate_moves = &self.get_candidate_moves(&[]);
-        self.front_left_block = generate_heuristic(BLOCK_CASES, "FreeF2L/FLB", candidate_moves);
-        self.front_right_block = generate_heuristic(BLOCK_CASES, "FreeF2L/FRB", candidate_moves);
-        self.back_left_block = generate_heuristic(BLOCK_CASES, "FreeF2L/BLB", candidate_moves);
-        self.back_right_block = generate_heuristic(BLOCK_CASES, "FreeF2L/BRB", candidate_moves);
+        self.front_left_block = self.generate_heuristic(BLOCK_CASES, "FreeF2L/FLB");
+        self.front_right_block = self.generate_heuristic(BLOCK_CASES, "FreeF2L/FRB");
+        self.back_left_block = self.generate_heuristic(BLOCK_CASES, "FreeF2L/BLB");
+        self.back_right_block = self.generate_heuristic(BLOCK_CASES, "FreeF2L/BRB");
     }
 
     fn assess_distance(&self, cube: &cube::Cube) -> usize {

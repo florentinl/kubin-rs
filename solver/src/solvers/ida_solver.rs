@@ -1,12 +1,44 @@
-use cube::{algorithms::Move, Cube};
+use crate::solvers::utils::{print_progress, print_terminated};
+use cube::{algorithms::Move, subcases::CubeSubset, Cube};
+use std::io::Write;
 
 use super::solver::Step;
-
+use std::collections::{HashMap, VecDeque};
 pub(super) trait IDAStepSolver: Step + Default {
     fn get_candidate_moves(&self, history: &[Vec<Move>]) -> Vec<Vec<Move>>;
     fn assess_distance(&self, cube: &Cube) -> usize;
     fn populate_candidate_moves(&mut self);
     fn populate_heuristics(&mut self);
+
+    fn generate_heuristic<T>(&self, case_count: usize, name: &str) -> HashMap<T, usize>
+    where
+        T: CubeSubset,
+    {
+        let mut cases = HashMap::with_capacity(case_count);
+        let mut queue = VecDeque::with_capacity(case_count);
+        queue.push_back((Cube::default(), 0));
+
+        while let Some((cube, distance)) = queue.pop_front() {
+            let progress = cases.len();
+            print_progress!("Generating lookup table for", name, progress, case_count);
+
+            let case = CubeSubset::from_cube(&cube);
+            if cases.contains_key(&case) {
+                continue;
+            }
+
+            cases.insert(case, distance);
+
+            for alg in self.get_candidate_moves(&[]) {
+                let mut cube = cube.clone();
+                cube.execute_algorithm(&alg);
+                queue.push_back((cube, distance + 4));
+            }
+        }
+        print_terminated!("Generating lookup table for", name, cases.len(), case_count);
+        cases
+    }
+
     fn search(
         &self,
         cube: &mut Cube,
