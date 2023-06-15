@@ -45,7 +45,7 @@ pub fn main() {
     let mut handlers = vec![];
 
     for _ in 0..number_of_threads {
-        let solver = solvers::methods::two_phase::Solver::new();
+        let solver = solvers::methods::free_fop::Solver::new();
         let method_times = method_times.clone();
         let method_lengths = method_lengths.clone();
         let handler = std::thread::spawn(move || {
@@ -76,6 +76,8 @@ pub fn main() {
         "Average length: {}",
         method_lengths.iter().sum::<usize>() / method_lengths.len()
     );
+    println!("95th percentile time: {}ms", ninety_five_percentile(&mut method_times));
+    println!("95th percentile length: {}", ninety_five_percentile(&mut method_lengths));
     println!("Worst time: {}ms", method_times.iter().max().unwrap());
     println!("Worst length: {}", method_lengths.iter().max().unwrap());
 }
@@ -103,4 +105,9 @@ fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<u128>, Vec<usiz
 fn median<T: Ord + Copy>(v: &mut Vec<T>) -> T {
     v.sort();
     v[v.len() / 2]
+}
+
+fn ninety_five_percentile<T: Ord + Copy>(v: &mut Vec<T>) -> T {
+    v.sort();
+    v[(v.len() as f64 * 0.95) as usize]
 }
