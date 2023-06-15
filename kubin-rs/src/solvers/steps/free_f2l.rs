@@ -22,9 +22,9 @@ pub struct Solver {
 }
 
 impl IDAStepSolver for Solver {
-    fn get_candidate_moves(&self, history: &Vec<Vec<Move>>) -> Vec<Vec<Move>> {
+    fn get_candidate_moves(&self, history: &[Vec<Move>]) -> Vec<Vec<Move>> {
         let mut candidate_moves = self.candidate_moves.clone();
-        if history.len() > 0 {
+        if !history.is_empty() {
             let previous_move = &history[history.len() - 1];
             let same_face_moves = previous_move.get(0).unwrap().same_face_moves();
             candidate_moves.retain(|x| !same_face_moves.contains(x.get(0).unwrap()));
@@ -32,8 +32,7 @@ impl IDAStepSolver for Solver {
         if history.len() > 1 {
             let previous_move = &history[history.len() - 1].get(0).unwrap();
             let previous_previous_move = &history[history.len() - 2].get(0).unwrap();
-            let opposit_face_moves = previous_move
-                .opposite_face_moves();
+            let opposit_face_moves = previous_move.opposite_face_moves();
             if opposit_face_moves.contains(previous_previous_move) {
                 candidate_moves.retain(|x| !opposit_face_moves.contains(x.get(0).unwrap()));
             }
@@ -49,21 +48,33 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_heuristics(&mut self) {
-        self.front_left_block =
-            generate_heuristic(BLOCK_CASES, "FreeF2L/FLB", &self.get_candidate_moves(&vec![]));
-        self.front_right_block =
-            generate_heuristic(BLOCK_CASES, "FreeF2L/FRB", &self.get_candidate_moves(&vec![]));
-        self.back_left_block =
-            generate_heuristic(BLOCK_CASES, "FreeF2L/BLB", &self.get_candidate_moves(&vec![]));
-        self.back_right_block =
-            generate_heuristic(BLOCK_CASES, "FreeF2L/BRB", &self.get_candidate_moves(&vec![]));
+        self.front_left_block = generate_heuristic(
+            BLOCK_CASES,
+            "FreeF2L/FLB",
+            &self.get_candidate_moves(&vec![]),
+        );
+        self.front_right_block = generate_heuristic(
+            BLOCK_CASES,
+            "FreeF2L/FRB",
+            &self.get_candidate_moves(&vec![]),
+        );
+        self.back_left_block = generate_heuristic(
+            BLOCK_CASES,
+            "FreeF2L/BLB",
+            &self.get_candidate_moves(&vec![]),
+        );
+        self.back_right_block = generate_heuristic(
+            BLOCK_CASES,
+            "FreeF2L/BRB",
+            &self.get_candidate_moves(&vec![]),
+        );
     }
 
     fn assess_distance(&self, cube: &cube::Cube) -> usize {
-        let front_left_block = FrontLeftBlock::from_cube(&cube);
-        let front_right_block = FrontRightBlock::from_cube(&cube);
-        let back_left_block = BackLeftBlock::from_cube(&cube);
-        let back_right_block = BackRightBlock::from_cube(&cube);
+        let front_left_block = FrontLeftBlock::from_cube(cube);
+        let front_right_block = FrontRightBlock::from_cube(cube);
+        let back_left_block = BackLeftBlock::from_cube(cube);
+        let back_right_block = BackRightBlock::from_cube(cube);
 
         let front_left_block_distance = self.front_left_block.get(&front_left_block).unwrap();
         let front_right_block_distance = self.front_right_block.get(&front_right_block).unwrap();

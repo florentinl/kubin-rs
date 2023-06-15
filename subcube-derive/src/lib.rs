@@ -2,12 +2,54 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::quote;
-use syn::{parse_macro_input, Data, DeriveInput, Type};
+use syn::{parse_macro_input, Data, DeriveInput};
 
-const CORNER_NAMES: [&str; 8] = ["ufr", "ufl", "ubr", "ulb", "dfr", "dlf", "drb", "dbl"];
+const CORNER_NAMES: [&str; 8] = ["urf", "ufl", "ubr", "ulb", "dfr", "dlf", "drb", "dbl"];
 const EDGE_NAMES: [&str; 12] = [
     "uf", "ub", "ur", "ul", "df", "db", "dr", "dl", "fr", "fl", "br", "bl",
 ];
+
+const POSITION_ONLY_SUFFIX: &str = "p";
+const ORIENTATION_ONLY_SUFFIX: &str = "o";
+
+enum PieceInfo {
+    PositionAndOrientation,
+    PositionOnly,
+    OrientationOnly,
+}
+
+enum PieceType {
+    Edge,
+    Corner,
+}
+
+fn parse_piece_name(name: &Ident) -> (String, PieceType, PieceInfo) {
+    let name = name.to_string();
+    let mut piece_name = name.clone();
+    let piece_type;
+    let mut piece_info = None;
+    // If the name contains and underscore, we know it's a position-only or orientation-only piece
+    if name.contains("_") {
+        let mut split = name.split("_");
+        piece_name = split.next().unwrap().to_string();
+        piece_info = split.next();
+    }
+
+    if EDGE_NAMES.contains(&piece_name.to_string().as_str()) {
+        piece_type = PieceType::Edge;
+    } else if CORNER_NAMES.contains(&piece_name.to_string().as_str()) {
+        piece_type = PieceType::Corner;
+    } else {
+        panic!("Invalid piece name");
+    }
+
+    match piece_info {
+        Some(POSITION_ONLY_SUFFIX) => (piece_name, piece_type, PieceInfo::PositionOnly),
+        Some(ORIENTATION_ONLY_SUFFIX) => (piece_name, piece_type, PieceInfo::OrientationOnly),
+        None => (piece_name, piece_type, PieceInfo::PositionAndOrientation),
+        _ => panic!("Invalid piece name"),
+    }
+}
 
 #[proc_macro_derive(CubeSubset)]
 pub fn cube_subset_derive(input: TokenStream) -> TokenStream {
@@ -23,13 +65,10 @@ pub fn cube_subset_derive(input: TokenStream) -> TokenStream {
                 None => panic!("CubeSubset can only be derived for named structs"),
             };
 
-            assert!(check_is_u8_tuple(&field.ty));
-            if EDGE_NAMES.contains(&name.to_string().as_str()) {
-                edges.push(name);
-            } else if CORNER_NAMES.contains(&name.to_string().as_str()) {
-                corners.push(name);
-            } else {
-                panic!("Invalid piece name");
+            let (piece_name, piece_type, piece_info) = parse_piece_name(&name);
+            match piece_type {
+                PieceType::Edge => edges.push((name, piece_name, piece_info)),
+                PieceType::Corner => corners.push((name, piece_name, piece_info)),
             }
         }
 
@@ -37,6 +76,12 @@ pub fn cube_subset_derive(input: TokenStream) -> TokenStream {
         let pieces_declaration = make_declarations(&edges, &corners);
         let edges_extraction = edge_extraction(&edges);
         let corners_extraction = corner_extraction(&corners);
+        let edges = edges
+            .iter()
+            .map(|(name, _, _)| quote! { #name: #name.clone() });
+        let corners = corners
+            .iter()
+            .map(|(name, _, _)| quote! { #name: #name.clone() });
 
         TokenStream::from(quote! {
             impl CubeSubset for #name {
@@ -58,22 +103,40 @@ pub fn cube_subset_derive(input: TokenStream) -> TokenStream {
     }
 }
 
-fn make_declarations(edges: &[Ident], corners: &[Ident]) -> Vec<proc_macro2::TokenStream> {
+fn make_declarations(
+    edges: &[(Ident, String, PieceInfo)],
+    corners: &[(Ident, String, PieceInfo)],
+) -> Vec<proc_macro2::TokenStream> {
     let pieces = edges.iter().chain(corners.iter()).collect::<Vec<_>>();
     pieces
         .iter()
-        .map(|name| {
-            quote! { let mut #name = (0, 0); }
+        .map(|(name, _, piece_info)| match piece_info {
+            PieceInfo::PositionAndOrientation => {
+                quote! { let mut #name = (0, 0); }
+            }
+            PieceInfo::PositionOnly | PieceInfo::OrientationOnly => {
+                quote! { let mut #name = 0; }
+            }
         })
         .collect::<Vec<_>>()
 }
 
-fn edge_extraction(edges: &[Ident]) -> proc_macro2::TokenStream {
+fn edge_extraction(edges: &[(Ident, String, PieceInfo)]) -> proc_macro2::TokenStream {
     let edge_match_statement = edges
         .iter()
-        .map(|name| {
-            let piece_name = Ident::new(&(name.to_string().to_uppercase()), name.span());
-            quote! { cube::edge::EdgePiece::#piece_name => #name = (i, *orientation), }
+        .map(|(name, piece_name, piece_info)| {
+            let piece_name = Ident::new(&(piece_name.to_uppercase()), name.span());
+            match piece_info {
+                PieceInfo::PositionAndOrientation => {
+                    quote! { cube::edge::EdgePiece::#piece_name => #name = (i, *orientation), }
+                }
+                PieceInfo::PositionOnly => {
+                    quote! { cube::edge::EdgePiece::#piece_name => #name = i, }
+                }
+                PieceInfo::OrientationOnly => {
+                    quote! { cube::edge::EdgePiece::#piece_name => #name = *orientation, }
+                }
+            }
         })
         .collect::<Vec<_>>();
     quote! {
@@ -86,13 +149,25 @@ fn edge_extraction(edges: &[Ident]) -> proc_macro2::TokenStream {
     }
 }
 
-fn corner_extraction(corners: &[Ident]) -> proc_macro2::TokenStream {
+fn corner_extraction(corners: &[(Ident, String, PieceInfo)]) -> proc_macro2::TokenStream {
     let corner_match_statement = corners
         .iter()
-        .map(|name| {
-            let piece_name =
-                Ident::new(&(to_first_letter_uppercase(name.to_string())), name.span());
-            quote! { cube::corner::CornerPiece::#piece_name => #name = (i, *orientation), }
+        .map(|(name, piece_name, piece_info)| {
+            let piece_name = Ident::new(
+                &(to_first_letter_uppercase(piece_name.to_string())),
+                name.span(),
+            );
+            match piece_info {
+                PieceInfo::PositionAndOrientation => quote! {
+                    cube::corner::CornerPiece::#piece_name => #name = (i, *orientation),
+                },
+                PieceInfo::PositionOnly => {
+                    quote! { cube::corner::CornerPiece::#piece_name => #name = i, }
+                }
+                PieceInfo::OrientationOnly => {
+                    quote! { cube::corner::CornerPiece::#piece_name => #name = *orientation, }
+                }
+            }
         })
         .collect::<Vec<_>>();
     quote! {
@@ -107,31 +182,4 @@ fn corner_extraction(corners: &[Ident]) -> proc_macro2::TokenStream {
 
 fn to_first_letter_uppercase(s: String) -> String {
     s[0..1].to_uppercase() + &s[1..]
-}
-
-fn check_is_u8_tuple(ty: &Type) -> bool {
-    match ty {
-        Type::Tuple(tuple) => {
-            let mut iter = tuple.elems.iter();
-            let first = iter.next().unwrap();
-            let second = iter.next().unwrap();
-            let first = match first {
-                Type::Path(path) => path,
-                _ => return false,
-            };
-            let second = match second {
-                Type::Path(path) => path,
-                _ => return false,
-            };
-            let first = first.path.segments.iter().next().unwrap();
-            let second = second.path.segments.iter().next().unwrap();
-            let first = &first.ident;
-            let second = &second.ident;
-            if first != "u8" || second != "u8" {
-                return false;
-            }
-            true
-        }
-        _ => false,
-    }
 }

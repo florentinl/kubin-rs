@@ -3,7 +3,7 @@ use cube::{algorithms::Move, Cube};
 use super::solver::StepSolver;
 
 pub(super) trait IDAStepSolver: StepSolver + Default {
-    fn get_candidate_moves(&self, history: &Vec<Vec<Move>>) -> Vec<Vec<Move>>;
+    fn get_candidate_moves(&self, history: &[Vec<Move>]) -> Vec<Vec<Move>>;
     fn assess_distance(&self, cube: &Cube) -> usize;
     fn populate_candidate_moves(&mut self);
     fn populate_heuristics(&mut self);
@@ -30,7 +30,7 @@ pub(super) trait IDAStepSolver: StepSolver + Default {
             path.extend(alg.iter().cloned());
             let mut history = history.clone();
             history.push(alg.clone());
-            let t = self.search(&mut cube, bound, path, Vec::new());
+            let t = self.search(&mut cube, bound, path, history);
             if t == 0 {
                 return 0;
             }

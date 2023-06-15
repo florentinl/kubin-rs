@@ -21,7 +21,7 @@ macro_rules! print_bfs_progress {
 }
 use std::collections::{HashMap, VecDeque};
 
-use cube::{subcases::CubeSubset, Cube, algorithms::Move};
+use cube::{algorithms::Move, subcases::CubeSubset, Cube};
 pub(crate) use print_bfs_progress;
 
 macro_rules! print_bfs_terminated {

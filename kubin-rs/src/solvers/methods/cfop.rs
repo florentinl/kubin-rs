@@ -1,6 +1,9 @@
-use cube::{Cube, algorithms::Move};
+use cube::{algorithms::Move, Cube};
 
-use crate::solvers::{steps::{cross, f2l, oll, pll}, solver::StepSolver};
+use crate::solvers::{
+    solver::StepSolver,
+    steps::{cross, f2l, oll, pll},
+};
 
 pub struct Solver {
     cross_solver: cross::Solver,

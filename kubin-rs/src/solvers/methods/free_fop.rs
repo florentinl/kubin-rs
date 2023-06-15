@@ -1,6 +1,9 @@
-use cube::{Cube, algorithms::Move};
+use cube::{algorithms::Move, Cube};
 
-use crate::solvers::{steps::{free_f2l, oll, pll}, solver::StepSolver};
+use crate::solvers::{
+    solver::StepSolver,
+    steps::{free_f2l, oll, pll},
+};
 
 pub struct Solver {
     free_f2l_solver: free_f2l::Solver,
