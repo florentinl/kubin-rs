@@ -1,8 +1,10 @@
-use kubin_rs::{scramble, solvers};
+use kubin_rs::{
+    scramble,
+    solvers::{self},
+};
 
 use cube::{self};
 
-/// Repl to run the program interactively
 pub fn main() {
     let number_of_scrambles = std::env::args()
         .nth(1)
@@ -20,13 +22,13 @@ pub fn main() {
     // println!("CFOP Solver initialized in {:?}", now.elapsed());
 
     let now = std::time::Instant::now();
-    let free_fop = solvers::methods::free_fop::Solver::new();
-    println!("FreeFOP Solver initialized in {:?}", now.elapsed());
+    let two_phase = solvers::methods::two_phase::Solver::new();
+    println!("GroupReduction Solver initialized in {:?}", now.elapsed());
 
     // let mut cfop_times = vec![];
     // let mut cfop_lengths = vec![];
-    let mut free_fop_times = vec![];
-    let mut free_fop_lengths = vec![];
+    let mut group_reduction_times = vec![];
+    let mut group_reduction_lengths = vec![];
 
     for (i, scramble) in scrambles.iter().enumerate() {
         if i % (scrambles.len() / 10) == 0 {
@@ -42,7 +44,7 @@ pub fn main() {
         // let elapsed = now.elapsed();
 
         let now = std::time::Instant::now();
-        let free_fop_solution = free_fop.solve(&cube_free_fop);
+        let two_phase_solution = two_phase.solve(&cube_free_fop);
         let elapsed2 = now.elapsed();
 
         // println!("Scramble: {:?}", scramble);
@@ -50,10 +52,10 @@ pub fn main() {
         // println!("FreeFOP solution: {:?}", free_fop_solution);
 
         // cfop_times.push(elapsed.as_millis() as u16);
-        free_fop_times.push(elapsed2.as_millis() as u16);
+        group_reduction_times.push(elapsed2.as_millis() as u16);
 
         // cfop_lengths.push(cfop_solution.len());
-        free_fop_lengths.push(free_fop_solution.len());
+        group_reduction_lengths.push(two_phase_solution.len());
     }
 
     // println!("CFOP:");
@@ -70,19 +72,25 @@ pub fn main() {
     // println!("Worst time: {}ms", cfop_times.iter().max().unwrap());
     // println!("Worst length: {}", cfop_lengths.iter().max().unwrap());
 
-    println!("FreeFOP:");
-    println!("Median time: {}ms", median(&mut free_fop_times));
+    println!("TwoPhase:");
+    println!("Median time: {}ms", median(&mut group_reduction_times));
     println!(
         "Average time: {}ms",
-        free_fop_times.iter().sum::<u16>() / free_fop_times.len() as u16
+        group_reduction_times.iter().sum::<u16>() / group_reduction_times.len() as u16
     );
-    println!("Median length: {}", median(&mut free_fop_lengths));
+    println!("Median length: {}", median(&mut group_reduction_lengths));
     println!(
         "Average length: {}",
-        free_fop_lengths.iter().sum::<usize>() / free_fop_lengths.len()
+        group_reduction_lengths.iter().sum::<usize>() / group_reduction_lengths.len()
     );
-    println!("Worst time: {}ms", free_fop_times.iter().max().unwrap());
-    println!("Worst length: {}", free_fop_lengths.iter().max().unwrap());
+    println!(
+        "Worst time: {}ms",
+        group_reduction_times.iter().max().unwrap()
+    );
+    println!(
+        "Worst length: {}",
+        group_reduction_lengths.iter().max().unwrap()
+    );
 }
 
 fn median<T: Ord + Copy>(v: &mut Vec<T>) -> T {
