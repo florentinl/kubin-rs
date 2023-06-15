@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use kubin_rs::{
+use solver::{
     scramble,
     solvers::{self, solver::MethodSolver},
 };
@@ -8,17 +8,34 @@ use kubin_rs::{
 use cube::{self};
 
 pub fn main() {
-    let number_of_scrambles = std::env::args()
-        .nth(1)
-        .unwrap_or_else(|| "100".to_string())
-        .parse::<usize>()
-        .unwrap();
+    let args = std::env::args().collect::<Vec<_>>();
 
-    let number_of_threads = std::env::args()
-        .nth(2)
-        .unwrap_or_else(|| "1".to_string())
+    if args.len() < 2 {
+        println!(
+            "Usage: {} <number of scrambles> [number of threads]",
+            args[0]
+        );
+        return;
+    }
+
+    let number_of_scrambles = args[1]
         .parse::<usize>()
-        .unwrap();
+        .expect("Number of scrambles must be a number");
+
+    let number_of_threads = args.get(2).map_or_else(
+        || {
+            std::thread::available_parallelism()
+                .expect("Failed to get number of threads")
+                .into()
+        },
+        |arg| {
+            arg.parse::<usize>()
+                .expect("Number of threads must be a number")
+        },
+    );
+
+    println!("Solving {} scrambles", number_of_scrambles);
+    println!("Using {} threads", number_of_threads);
 
     let scrambles_per_thread = number_of_scrambles / number_of_threads;
 
@@ -28,7 +45,7 @@ pub fn main() {
     let mut handlers = vec![];
 
     for _ in 0..number_of_threads {
-        let solver = solvers::methods::free_fop::Solver::new();
+        let solver = solvers::methods::two_phase::Solver::new();
         let method_times = method_times.clone();
         let method_lengths = method_lengths.clone();
         let handler = std::thread::spawn(move || {
@@ -38,6 +55,8 @@ pub fn main() {
         });
         handlers.push(handler);
     }
+
+    println!("All threads spawned");
 
     for handler in handlers {
         handler.join().unwrap();

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use cube::subcases::CubeSubset;
-use subcube_derive::CubeSubset;
+use cube_macros::CubeSubset;
 
 pub(crate) const CROSS_CASES: usize = 190_080;
 

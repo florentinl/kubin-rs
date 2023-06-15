@@ -1,6 +1,6 @@
 use cube::subcases::CubeSubset;
+use cube_macros::CubeSubset;
 use serde::{Deserialize, Serialize};
-use subcube_derive::CubeSubset;
 
 pub(crate) const BLOCK_CASES: usize = (8 * 3) * (12 * 11 * 10 * usize::pow(2, 3));
 

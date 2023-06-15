@@ -40,7 +40,6 @@ pub(super) trait StepSolver: Sized + Serialize + for<'de> Deserialize<'de> {
     fn solve(&self, cube: &Cube) -> Vec<Move>;
 }
 
-
 pub trait MethodSolver {
     fn solve(&self, cube: &Cube) -> Vec<Move>;
 }

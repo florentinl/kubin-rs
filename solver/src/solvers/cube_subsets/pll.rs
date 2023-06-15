@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use cube::subcases::CubeSubset;
 
-use subcube_derive::CubeSubset;
+use cube_macros::CubeSubset;
 pub(crate) const PLL_CASES: usize = 22 * 4;
 
 #[derive(PartialEq, Eq, Hash, Clone, Serialize, Deserialize, CubeSubset)]

@@ -1,6 +1,6 @@
 use cube::subcases::CubeSubset;
+use cube_macros::CubeSubset;
 use serde::{Deserialize, Serialize};
-use subcube_derive::CubeSubset;
 
 pub(crate) const CP_CASES: usize = 8 * 7 * 6 * 5 * 4 * 3 * 2;
 

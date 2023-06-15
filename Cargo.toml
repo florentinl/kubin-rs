@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "kubin-rs",
+    "solver",
     "cube",
-    "subcube-derive",
+    "cube-macros",
 ]

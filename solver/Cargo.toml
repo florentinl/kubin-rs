@@ -1,5 +1,5 @@
 [package]
-name = "kubin-rs"
+name = "solver"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 cube = { path = "../cube" }
-subcube-derive = { path = "../subcube-derive" }
+cube-macros = { path = "../cube-macros" }
 rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 ron = "0.8"
