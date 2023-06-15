@@ -10,25 +10,25 @@ use crate::solvers::{
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct Solver {
-    candidate_moves: Vec<Vec<Move>>,
+    candidate_moves: Vec<Move>,
     corner_permutation: HashMap<CornerPermutation, usize>,
     edge_permutation: HashMap<EdgePermutation, usize>,
 }
 
 impl IDAStepSolver for Solver {
-    fn get_candidate_moves(&self, history: &[Vec<Move>]) -> Vec<Vec<Move>> {
+    fn get_candidate_moves(&self, history: &[Move]) -> Vec<Move> {
         let mut candidate_moves = self.candidate_moves.clone();
         if !history.is_empty() {
             let previous_move = &history[history.len() - 1];
-            let same_face_moves = previous_move.get(0).unwrap().same_face_moves();
-            candidate_moves.retain(|x| !same_face_moves.contains(x.get(0).unwrap()));
+            let same_face_moves = previous_move.same_face_moves();
+            candidate_moves.retain(|m| !same_face_moves.contains(m));
         }
         if history.len() > 1 {
-            let previous_move = &history[history.len() - 1].get(0).unwrap();
-            let previous_previous_move = &history[history.len() - 2].get(0).unwrap();
+            let previous_move = &history[history.len() - 1];
+            let previous_previous_move = &history[history.len() - 2];
             let opposit_face_moves = previous_move.opposite_face_moves();
             if opposit_face_moves.contains(previous_previous_move) {
-                candidate_moves.retain(|x| !opposit_face_moves.contains(x.get(0).unwrap()));
+                candidate_moves.retain(|x| !opposit_face_moves.contains(x));
             }
         }
         candidate_moves
@@ -46,16 +46,16 @@ impl IDAStepSolver for Solver {
 
     fn populate_candidate_moves(&mut self) {
         self.candidate_moves.extend(vec![
-            vec![Move::U2],
-            vec![Move::Up],
-            vec![Move::U],
-            vec![Move::D2],
-            vec![Move::Dp],
-            vec![Move::D],
-            vec![Move::R2],
-            vec![Move::L2],
-            vec![Move::F2],
-            vec![Move::B2],
+            Move::U2,
+            Move::Up,
+            Move::U,
+            Move::D2,
+            Move::Dp,
+            Move::D,
+            Move::R2,
+            Move::L2,
+            Move::F2,
+            Move::B2,
         ]);
     }
 

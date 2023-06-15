@@ -45,7 +45,7 @@ pub fn main() {
     let mut handlers = vec![];
 
     for _ in 0..number_of_threads {
-        let solver = solvers::methods::free_fop::Solver::new();
+        let solver = solvers::methods::cfop::Solver::new();
         let method_times = method_times.clone();
         let method_lengths = method_lengths.clone();
         let handler = std::thread::spawn(move || {
@@ -94,6 +94,9 @@ fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<u128>, Vec<usiz
         let now = std::time::Instant::now();
         let solution = solver.solve(&cube);
         let elapsed = now.elapsed();
+
+        println!("Scramble: {}", cube::algorithms::algorithm_to_string(&scramble));
+        println!("Solution: {}", cube::algorithms::algorithm_to_string(&solution));
 
         times.push(elapsed.as_millis());
         lengths.push(solution.len());

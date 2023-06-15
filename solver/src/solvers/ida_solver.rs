@@ -5,7 +5,7 @@ use std::io::Write;
 use super::solver::Step;
 use std::collections::{HashMap, VecDeque};
 pub(super) trait IDAStepSolver: Step + Default {
-    fn get_candidate_moves(&self, history: &[Vec<Move>]) -> Vec<Vec<Move>>;
+    fn get_candidate_moves(&self, history: &[Move]) -> Vec<Move>;
     fn assess_distance(&self, cube: &Cube) -> usize;
     fn populate_candidate_moves(&mut self);
     fn populate_heuristics(&mut self);
@@ -31,7 +31,7 @@ pub(super) trait IDAStepSolver: Step + Default {
 
             for alg in self.get_candidate_moves(&[]) {
                 let mut cube = cube.clone();
-                cube.execute_algorithm(&alg);
+                cube.execute_move(&alg);
                 queue.push_back((cube, distance + 4));
             }
         }
@@ -44,7 +44,6 @@ pub(super) trait IDAStepSolver: Step + Default {
         cube: &mut Cube,
         bound: usize,
         path: &mut Vec<Move>,
-        history: Vec<Vec<Move>>,
     ) -> usize {
         let distance = self.assess_distance(cube);
         let local_lower_bound = path.len() + distance;
@@ -56,22 +55,18 @@ pub(super) trait IDAStepSolver: Step + Default {
         }
         let mut min = usize::MAX;
 
-        for alg in self.get_candidate_moves(&history) {
+        for alg in self.get_candidate_moves(&path) {
             let mut cube = cube.clone();
-            cube.execute_algorithm(&alg);
-            path.extend(alg.iter().cloned());
-            let mut history = history.clone();
-            history.push(alg.clone());
-            let t = self.search(&mut cube, bound, path, history);
+            cube.execute_move(&alg);
+            path.push(alg);
+            let t = self.search(&mut cube, bound, path);
             if t == 0 {
                 return 0;
             }
             if t < min {
                 min = t;
             }
-            for _ in 0..alg.len() {
-                path.pop();
-            }
+            path.pop();
         }
         min
     }
@@ -90,7 +85,7 @@ impl<T: IDAStepSolver> Step for T {
         let mut bound = self.assess_distance(&cube);
         let mut path = vec![];
         loop {
-            let t = self.search(&mut cube, bound, &mut path, Vec::new());
+            let t = self.search(&mut cube, bound, &mut path);
             if t == 0 {
                 return path.iter().filter(|x| **x != Move::None).cloned().collect();
             }
