@@ -16,11 +16,17 @@ pub fn main() {
     }
 
     let now = std::time::Instant::now();
-    let solver = solvers::cfop::Solver::new();
-    println!("Solver initialized in {:?}", now.elapsed());
+    let cfop = solvers::methods::cfop::Solver::new();
+    println!("CFOP Solver initialized in {:?}", now.elapsed());
 
-    let mut times = vec![];
-    let mut lengths = vec![];
+    let now = std::time::Instant::now();
+    let free_fop = solvers::methods::free_fop::Solver::new();
+    println!("FreeFOP Solver initialized in {:?}", now.elapsed());
+
+    let mut cfop_times = vec![];
+    let mut cfop_lengths = vec![];
+    let mut free_fop_times = vec![];
+    let mut free_fop_lengths = vec![];
 
     for (i, scramble) in scrambles.iter().enumerate() {
         if i % (scrambles.len() / 10) == 0 {
@@ -28,26 +34,51 @@ pub fn main() {
         }
         let mut cube = cube::Cube::default();
         cube.execute_algorithm(scramble);
+        let cube_cfop = cube.clone();
+        let cube_free_fop = cube.clone();
 
         let now = std::time::Instant::now();
-        let solution = solver.solve(&cube);
+        let cfop_solution = cfop.solve(&cube_cfop);
         let elapsed = now.elapsed();
-        times.push(elapsed.as_millis() as u16);
-        lengths.push(solution.len());
+
+        let now = std::time::Instant::now();
+        let free_fop_solution = free_fop.solve(&cube_free_fop);
+        let elapsed2 = now.elapsed();
+
+        cfop_times.push(elapsed.as_millis() as u16);
+        free_fop_times.push(elapsed2.as_millis() as u16);
+
+        cfop_lengths.push(cfop_solution.len());
+        free_fop_lengths.push(free_fop_solution.len());
     }
 
-    println!("Median time: {}ms", median(&mut times));
+    println!("CFOP:");
+    println!("Median time: {}ms", median(&mut cfop_times));
     println!(
         "Average time: {}ms",
-        times.iter().sum::<u16>() / times.len() as u16
+        cfop_times.iter().sum::<u16>() / cfop_times.len() as u16
     );
-    println!("Median length: {}", median(&mut lengths));
+    println!("Median length: {}", median(&mut cfop_lengths));
     println!(
         "Average length: {}",
-        lengths.iter().sum::<usize>() / lengths.len()
+        cfop_lengths.iter().sum::<usize>() / cfop_lengths.len()
     );
-    println!("Worst time: {}ms", times.iter().max().unwrap());
-    println!("Worst length: {}", lengths.iter().max().unwrap());
+    println!("Worst time: {}ms", cfop_times.iter().max().unwrap());
+    println!("Worst length: {}", cfop_lengths.iter().max().unwrap());
+
+    println!("FreeFOP:");
+    println!("Median time: {}ms", median(&mut free_fop_times));
+    println!(
+        "Average time: {}ms",
+        free_fop_times.iter().sum::<u16>() / free_fop_times.len() as u16
+    );
+    println!("Median length: {}", median(&mut free_fop_lengths));
+    println!(
+        "Average length: {}",
+        free_fop_lengths.iter().sum::<usize>() / free_fop_lengths.len()
+    );
+    println!("Worst time: {}ms", free_fop_times.iter().max().unwrap());
+    println!("Worst length: {}", free_fop_lengths.iter().max().unwrap());
 }
 
 fn median<T: Ord + Copy>(v: &mut Vec<T>) -> T {
