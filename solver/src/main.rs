@@ -41,7 +41,7 @@ pub fn main() {
 
     let scrambles_per_thread = number_of_scrambles / number_of_threads;
 
-    let solver = solvers::methods::two_phase::Solver::new();
+    let solver = solvers::methods::cfop::Solver::new();
     let method_times = Arc::new(Mutex::new(vec![]));
     let method_lengths = Arc::new(Mutex::new(vec![]));
 
@@ -127,5 +127,5 @@ fn median<T: Ord + Copy>(v: &mut Vec<T>) -> T {
 
 fn ninety_five_percentile<T: Ord + Copy>(v: &mut Vec<T>) -> T {
     v.sort();
-    v[(v.len() as f64 * 0.95) as usize]
+    v[v.len() * 95 / 100]
 }

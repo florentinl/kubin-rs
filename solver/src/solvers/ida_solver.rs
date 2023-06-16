@@ -50,7 +50,7 @@ pub(super) trait IDAStepSolver: Step + Default {
         }
         let mut min = usize::MAX;
 
-        for alg in self.get_candidate_moves(&path) {
+        for alg in self.get_candidate_moves(path) {
             cube.execute_move(&alg);
             path.push(alg.clone());
             let t = self.search(cube, bound, path);

@@ -57,14 +57,15 @@ impl Solver {
 
         for alg in pll_algs {
             let alg = parse_algorithm(alg);
-            let mut cube = Cube::default();
-            cube.execute_algorithm(&invert_algorithm(&alg));
-            let case = Pll::from_cube(&cube);
-            for case in case.mirror_case() {
-                cases.insert(case, alg.clone());
+            for auf in &[Move::None, Move::U, Move::U2, Move::Up] {
+                let mut cube = Cube::default();
+                cube.execute_move(auf);
+                cube.execute_algorithm(&alg);
+                let case = Pll::from_cube(&cube);
+                let alg = invert_algorithm(&alg);
+                cases.insert(case, alg);
             }
         }
-
         cases
     }
 

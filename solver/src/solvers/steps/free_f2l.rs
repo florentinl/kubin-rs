@@ -40,7 +40,7 @@ impl IDAStepSolver for Solver {
     }
 
     fn populate_candidate_moves(&mut self) {
-        self.candidate_moves = cube::algorithms::ALL_MOVES.to_vec()
+        self.candidate_moves = cube::algorithms::ALL_MOVES.to_vec();
     }
 
     fn populate_heuristics(&mut self) {

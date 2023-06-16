@@ -39,6 +39,6 @@ pub(super) trait Step: Sized + Serialize + for<'de> Deserialize<'de> + Clone {
     fn solve(&self, cube: &Cube) -> Vec<Move>;
 }
 
-pub trait Method : Clone {
+pub trait Method: Clone {
     fn solve(&self, cube: &Cube) -> Vec<Move>;
 }
