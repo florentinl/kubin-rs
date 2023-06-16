@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, ops::Add};
 
 use cube::{algorithms::Move, subcases::CubeSubset};
 use serde::{Deserialize, Serialize};
@@ -53,9 +53,9 @@ impl IDAStepSolver for Solver {
             .unwrap()
             .max(self.edge_permutation_2.get(&edge_permutation_2).unwrap());
 
-        *orientation_moves
-            .max(corner_permutation_moves)
-            .max(edge_permutation_moves)
+        orientation_moves
+            .add(corner_permutation_moves)
+            .add(edge_permutation_moves)
     }
 
     fn populate_candidate_moves(&mut self) {

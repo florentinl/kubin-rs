@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::{sync::{Arc, Mutex}, time::Duration};
 
 use solver::{
     scramble,
@@ -41,7 +41,7 @@ pub fn main() {
 
     let scrambles_per_thread = number_of_scrambles / number_of_threads;
 
-    let solver = solvers::methods::cfop::Solver::new();
+    let solver = solvers::methods::two_phase::Solver::new();
     let method_times = Arc::new(Mutex::new(vec![]));
     let method_lengths = Arc::new(Mutex::new(vec![]));
 
@@ -69,10 +69,10 @@ pub fn main() {
     let mut method_lengths = method_lengths.lock().unwrap().clone();
 
     println!("Results:");
-    println!("Median time: {}ms", median(&mut method_times));
+    println!("Median time: {:?}", median(&mut method_times));
     println!(
-        "Average time: {}ms",
-        method_times.iter().sum::<u128>() / method_times.len() as u128
+        "Average time: {:?}",
+        method_times.iter().sum::<Duration>() / method_times.len().try_into().unwrap()
     );
     println!("Median length: {}", median(&mut method_lengths));
     println!(
@@ -80,18 +80,18 @@ pub fn main() {
         method_lengths.iter().sum::<usize>() / method_lengths.len()
     );
     println!(
-        "95th percentile time: {}ms",
+        "95th percentile time: {:?}",
         ninety_five_percentile(&mut method_times)
     );
     println!(
         "95th percentile length: {}",
         ninety_five_percentile(&mut method_lengths)
     );
-    println!("Worst time: {}ms", method_times.iter().max().unwrap());
+    println!("Worst time: {:?}", method_times.iter().max().unwrap());
     println!("Worst length: {}", method_lengths.iter().max().unwrap());
 }
 
-fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<u128>, Vec<usize>) {
+fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<Duration>, Vec<usize>) {
     let mut times = vec![];
     let mut lengths = vec![];
 
@@ -104,16 +104,16 @@ fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<u128>, Vec<usiz
         let solution = solver.solve(&cube);
         let elapsed = now.elapsed();
 
-        println!(
-            "Scramble: {}",
-            cube::algorithms::algorithm_to_string(&scramble)
-        );
-        println!(
-            "Solution: {}",
-            cube::algorithms::algorithm_to_string(&solution)
-        );
+        // println!(
+        //     "Scramble: {}",
+        //     cube::algorithms::algorithm_to_string(&scramble)
+        // );
+        // println!(
+        //     "Solution: {}",
+        //     cube::algorithms::algorithm_to_string(&solution)
+        // );
 
-        times.push(elapsed.as_millis());
+        times.push(elapsed);
         lengths.push(solution.len());
     }
 
