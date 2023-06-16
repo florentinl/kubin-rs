@@ -5,6 +5,7 @@ use crate::solvers::{
     steps::{orientation, permutation},
 };
 
+#[derive(Clone)]
 pub struct Solver {
     orientation_solver: orientation::Solver,
     permutation_solver: permutation::Solver,

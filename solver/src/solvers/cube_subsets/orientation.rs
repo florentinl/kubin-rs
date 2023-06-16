@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 pub(crate) const ORIENTATION_CASES: usize = usize::pow(3, 7) * usize::pow(2, 11);
 
-#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
 pub(crate) struct Orientation {
     uf: u8,
     ur: u8,

@@ -49,6 +49,31 @@ impl Move {
             Move::None => vec![Move::None],
         }
     }
+
+    #[must_use]
+    pub fn inverse(&self) -> Move {
+        match self {
+            Move::U => Move::Up,
+            Move::U2 => Move::U2,
+            Move::Up => Move::U,
+            Move::D => Move::Dp,
+            Move::D2 => Move::D2,
+            Move::Dp => Move::D,
+            Move::F => Move::Fp,
+            Move::F2 => Move::F2,
+            Move::Fp => Move::F,
+            Move::B => Move::Bp,
+            Move::B2 => Move::B2,
+            Move::Bp => Move::B,
+            Move::R => Move::Rp,
+            Move::R2 => Move::R2,
+            Move::Rp => Move::R,
+            Move::L => Move::Lp,
+            Move::L2 => Move::L2,
+            Move::Lp => Move::L,
+            Move::None => Move::None,
+        }
+    }
 }
 
 impl ToString for Move {

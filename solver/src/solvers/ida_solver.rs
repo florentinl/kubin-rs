@@ -16,9 +16,9 @@ pub(super) trait IDAStepSolver: Step + Default {
     {
         let mut cases = HashMap::with_capacity(case_count);
         let mut queue = VecDeque::with_capacity(case_count);
-        queue.push_back((Cube::default(), 0));
+        queue.push_back((Cube::default(), 0, Move::None, Move::None));
 
-        while let Some((cube, distance)) = queue.pop_front() {
+        while let Some((cube, distance, last_move, last_last_move)) = queue.pop_front() {
             let progress = cases.len();
             print_progress!("Generating lookup table for", name, progress, case_count);
 
@@ -29,10 +29,10 @@ pub(super) trait IDAStepSolver: Step + Default {
 
             cases.insert(case, distance);
 
-            for alg in self.get_candidate_moves(&[]) {
+            for move_ in self.get_candidate_moves(&[last_last_move, last_move.clone()]) {
                 let mut cube = cube.clone();
-                cube.execute_move(&alg);
-                queue.push_back((cube, distance + 4));
+                cube.execute_move(&move_);
+                queue.push_back((cube, distance + 1, move_, last_move.clone()));
             }
         }
         print_terminated!("Generating lookup table for", name, cases.len(), case_count);
@@ -51,10 +51,9 @@ pub(super) trait IDAStepSolver: Step + Default {
         let mut min = usize::MAX;
 
         for alg in self.get_candidate_moves(&path) {
-            let mut cube = cube.clone();
             cube.execute_move(&alg);
-            path.push(alg);
-            let t = self.search(&mut cube, bound, path);
+            path.push(alg.clone());
+            let t = self.search(cube, bound, path);
             if t == 0 {
                 return 0;
             }
@@ -62,6 +61,7 @@ pub(super) trait IDAStepSolver: Step + Default {
                 min = t;
             }
             path.pop();
+            cube.execute_move(&alg.inverse());
         }
         min
     }

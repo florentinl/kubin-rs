@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::solvers::utils::print_terminated;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Solver {
     cases: HashMap<Cross, Vec<Move>>,
 }

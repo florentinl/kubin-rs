@@ -7,6 +7,8 @@ use solver::{
 
 use cube::{self};
 
+const MOVE_COUNT: usize = 20;
+
 pub fn main() {
     let args = std::env::args().collect::<Vec<_>>();
 
@@ -39,13 +41,14 @@ pub fn main() {
 
     let scrambles_per_thread = number_of_scrambles / number_of_threads;
 
+    let solver = solvers::methods::two_phase::Solver::new();
     let method_times = Arc::new(Mutex::new(vec![]));
     let method_lengths = Arc::new(Mutex::new(vec![]));
 
     let mut handlers = vec![];
 
     for _ in 0..number_of_threads {
-        let solver = solvers::methods::two_phase::Solver::new();
+        let solver = solver.clone();
         let method_times = method_times.clone();
         let method_lengths = method_lengths.clone();
         let handler = std::thread::spawn(move || {
@@ -93,7 +96,7 @@ fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<u128>, Vec<usiz
     let mut lengths = vec![];
 
     for _ in 0..count {
-        let scramble = scramble::generate();
+        let scramble = scramble::generate(MOVE_COUNT);
         let mut cube = cube::Cube::default();
         cube.execute_algorithm(&scramble);
 
@@ -101,8 +104,14 @@ fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<u128>, Vec<usiz
         let solution = solver.solve(&cube);
         let elapsed = now.elapsed();
 
-        // println!("Scramble: {}", cube::algorithms::algorithm_to_string(&scramble));
-        // println!("Solution: {}", cube::algorithms::algorithm_to_string(&solution));
+        println!(
+            "Scramble: {}",
+            cube::algorithms::algorithm_to_string(&scramble)
+        );
+        println!(
+            "Solution: {}",
+            cube::algorithms::algorithm_to_string(&solution)
+        );
 
         times.push(elapsed.as_millis());
         lengths.push(solution.len());

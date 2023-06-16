@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::ops::Add;
 
 use cube::algorithms::Move;
 use cube::subcases::CubeSubset;
@@ -10,7 +11,7 @@ use crate::solvers::{
     ida_solver::IDAStepSolver,
 };
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Clone)]
 pub struct Solver {
     candidate_moves: Vec<Move>,
     front_left_block: HashMap<FrontLeftBlock, usize>,
@@ -60,14 +61,9 @@ impl IDAStepSolver for Solver {
         let back_left_block_distance = self.back_left_block.get(&back_left_block).unwrap();
         let back_right_block_distance = self.back_right_block.get(&back_right_block).unwrap();
 
-        **[
-            front_left_block_distance,
-            front_right_block_distance,
-            back_left_block_distance,
-            back_right_block_distance,
-        ]
-        .iter()
-        .max()
-        .unwrap()
+        front_left_block_distance
+            .add(front_right_block_distance)
+            .add(back_left_block_distance)
+            .add(back_right_block_distance)
     }
 }

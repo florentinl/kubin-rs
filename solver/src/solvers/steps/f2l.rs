@@ -4,7 +4,7 @@
 //! solve the F2Ls. We restrict the moves to three move triggers separated by U
 //! moves, so that the cross is not disturbed.
 
-use std::collections::HashMap;
+use std::{collections::HashMap, ops::Add};
 
 use crate::solvers::{
     cube_subsets::{
@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 use cube::subcases::CubeSubset;
 use cube::{self, algorithms::Move, Cube};
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Clone)]
 pub struct Solver {
     candidate_moves: Vec<Move>,
     cross_cases: HashMap<Cross, usize>,
@@ -68,16 +68,16 @@ impl IDAStepSolver for Solver {
         let back_left_block = BackLeftBlock::from_cube(cube);
         let back_right_block = BackRightBlock::from_cube(cube);
 
-        let cross_distance = *self.cross_cases.get(&cross).unwrap();
+        let cross_distance = self.cross_cases.get(&cross).unwrap();
         let front_left_block_distance = self.front_left_block.get(&front_left_block).unwrap();
         let front_right_block_distance = self.front_right_block.get(&front_right_block).unwrap();
         let back_left_block_distance = self.back_left_block.get(&back_left_block).unwrap();
         let back_right_block_distance = self.back_right_block.get(&back_right_block).unwrap();
 
         cross_distance
-            .max(*front_left_block_distance)
-            .max(*front_right_block_distance)
-            .max(*back_left_block_distance)
-            .max(*back_right_block_distance)
+            .add(front_left_block_distance)
+            .add(front_right_block_distance)
+            .add(back_left_block_distance)
+            .add(back_right_block_distance)
     }
 }

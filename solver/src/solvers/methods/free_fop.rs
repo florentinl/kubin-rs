@@ -5,6 +5,7 @@ use crate::solvers::{
     steps::{free_f2l, oll, pll},
 };
 
+#[derive(Clone)]
 pub struct Solver {
     free_f2l_solver: free_f2l::Solver,
     oll_solver: oll::Solver,

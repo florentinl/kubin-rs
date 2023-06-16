@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 pub(crate) const EDGE_IN_SLICE_CASES: usize = 495;
 
-#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
 pub(crate) struct EdgeInSlice {
     edge_mask: u16,
 }

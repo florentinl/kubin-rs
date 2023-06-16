@@ -8,7 +8,7 @@ use crate::solvers::{
     ida_solver::IDAStepSolver,
 };
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Clone)]
 pub struct Solver {
     candidate_moves: Vec<Move>,
     corner_permutation: HashMap<CornerPermutation, usize>,

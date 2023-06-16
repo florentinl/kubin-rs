@@ -21,7 +21,7 @@ use cube::{
 use crate::solvers::cube_subsets::Oll;
 use crate::solvers::cube_subsets::OLL_CASES;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Solver {
     cases: HashMap<Oll, Vec<Move>>,
 }

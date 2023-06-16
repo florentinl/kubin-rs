@@ -6,7 +6,7 @@ use cube::{self, Cube};
 
 pub(crate) const OLL_CASES: usize = 58;
 
-#[derive(PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Clone, Serialize, Deserialize)]
 pub(crate) struct Oll {
     uf: u8,
     ur: u8,

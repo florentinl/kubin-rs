@@ -25,6 +25,10 @@ pub(super) use self::pll::PLL_CASES;
 pub(super) use self::ep::EdgePermutation;
 pub(super) use self::ep::EP_CASES;
 
+pub(super) use self::ep::Edge6_1Permutation;
+pub(super) use self::ep::Edge6_2Permutation;
+pub(super) use self::ep::E6P_CASES;
+
 pub(super) use self::cp::CornerPermutation;
 pub(super) use self::cp::CP_CASES;
 

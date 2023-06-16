@@ -5,6 +5,7 @@ use crate::solvers::{
     steps::{cross, f2l, oll, pll},
 };
 
+#[derive(Clone)]
 pub struct Solver {
     cross_solver: cross::Solver,
     f2l_solver: f2l::Solver,

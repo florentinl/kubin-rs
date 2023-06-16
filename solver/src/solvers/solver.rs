@@ -7,7 +7,7 @@ use std::{
 use cube::{algorithms::Move, Cube};
 use serde::{Deserialize, Serialize};
 
-pub(super) trait Step: Sized + Serialize + for<'de> Deserialize<'de> {
+pub(super) trait Step: Sized + Serialize + for<'de> Deserialize<'de> + Clone {
     fn new(path: &str) -> Self {
         if let Ok(solver) = Self::from_file(path) {
             solver
@@ -39,6 +39,6 @@ pub(super) trait Step: Sized + Serialize + for<'de> Deserialize<'de> {
     fn solve(&self, cube: &Cube) -> Vec<Move>;
 }
 
-pub trait Method {
+pub trait Method : Clone {
     fn solve(&self, cube: &Cube) -> Vec<Move>;
 }
