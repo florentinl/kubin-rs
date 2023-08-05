@@ -21,22 +21,9 @@ pub struct Solver {
 }
 
 impl IDAStepSolver for Solver {
-    fn get_candidate_moves(&self, history: &[Move]) -> Vec<Move> {
-        let mut candidate_moves = self.candidate_moves.clone();
-        if !history.is_empty() {
-            let previous_move = &history[history.len() - 1];
-            let same_face_moves = previous_move.same_face_moves();
-            candidate_moves.retain(|m| !same_face_moves.contains(m));
-        }
-        if history.len() > 1 {
-            let previous_move = &history[history.len() - 1];
-            let previous_previous_move = &history[history.len() - 2];
-            let opposit_face_moves = previous_move.opposite_face_moves();
-            if opposit_face_moves.contains(previous_previous_move) {
-                candidate_moves.retain(|x| !opposit_face_moves.contains(x));
-            }
-        }
-        candidate_moves
+    #[inline]
+    fn get_all_moves(&self) -> &[Move] {
+        &self.candidate_moves
     }
 
     fn populate_candidate_moves(&mut self) {

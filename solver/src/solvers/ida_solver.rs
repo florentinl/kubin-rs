@@ -5,10 +5,28 @@ use std::io::Write;
 use super::solver::Step;
 use std::collections::{HashMap, VecDeque};
 pub(super) trait IDAStepSolver: Step + Default {
-    fn get_candidate_moves(&self, history: &[Move]) -> Vec<Move>;
+    fn get_all_moves(&self) -> &[Move];
     fn assess_distance(&self, cube: &Cube) -> usize;
     fn populate_candidate_moves(&mut self);
     fn populate_heuristics(&mut self);
+
+    fn get_candidate_moves(&self, moves: &[Move], history: &[Move]) -> Vec<Move> {
+        let mut candidate_moves = moves.to_vec();
+        if !history.is_empty() {
+            let previous_move = &history[history.len() - 1];
+            let same_face_moves = previous_move.same_face_moves();
+            candidate_moves.retain(|m| !same_face_moves.contains(m));
+        }
+        if history.len() > 1 {
+            let previous_move = &history[history.len() - 1];
+            let previous_previous_move = &history[history.len() - 2];
+            let opposit_face_moves = previous_move.opposite_face_moves();
+            if opposit_face_moves.contains(previous_previous_move) {
+                candidate_moves.retain(|x| !opposit_face_moves.contains(x));
+            }
+        }
+        candidate_moves
+    }
 
     fn generate_heuristic<T>(&self, case_count: usize, name: &str) -> HashMap<T, usize>
     where
@@ -28,8 +46,8 @@ pub(super) trait IDAStepSolver: Step + Default {
             }
 
             cases.insert(case, distance);
-
-            for move_ in self.get_candidate_moves(&[last_last_move, last_move.clone()]) {
+            let moves = self.get_all_moves();
+            for move_ in self.get_candidate_moves(moves, &[last_last_move, last_move.clone()]) {
                 let mut cube = cube.clone();
                 cube.execute_move(&move_);
                 queue.push_back((cube, distance + 1, move_, last_move.clone()));
@@ -50,7 +68,8 @@ pub(super) trait IDAStepSolver: Step + Default {
         }
         let mut min = usize::MAX;
 
-        for alg in self.get_candidate_moves(path) {
+        let moves = self.get_all_moves();
+        for alg in self.get_candidate_moves(moves, path) {
             cube.execute_move(&alg);
             path.push(alg.clone());
             let t = self.search(cube, bound, path);
