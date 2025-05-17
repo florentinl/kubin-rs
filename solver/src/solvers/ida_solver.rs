@@ -99,7 +99,6 @@ impl<T: IDAStepSolver> Step for T {
         let mut bound = self.assess_distance(&cube);
         let mut path = vec![];
         loop {
-            println!("Bound: {}", bound);
             let t = self.search(&mut cube, bound, &mut path);
             if t == 0 {
                 return path.iter().filter(|x| **x != Move::None).cloned().collect();

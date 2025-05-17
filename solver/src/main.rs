@@ -5,7 +5,7 @@ use std::{
 
 use solver::{
     scramble,
-    solvers::{self, solver::Method},
+    solvers::{methods::from_method_name, solver::Method},
 };
 
 use cube::{self};
@@ -15,19 +15,22 @@ const MOVE_COUNT: usize = 20;
 pub fn main() {
     let args = std::env::args().collect::<Vec<_>>();
 
-    if args.len() < 2 {
+    if args.len() < 3 {
         println!(
-            "Usage: {} <number of scrambles> [number of threads]",
+            "Usage: {} <solver> <number of scrambles> [number of threads]",
             args[0]
         );
         return;
     }
 
-    let number_of_scrambles = args[1]
+    let solver = from_method_name(&args[1].clone())
+        .expect("The solver must be one of cfop|free_fop|one_phase|two_phase");
+
+    let number_of_scrambles = args[2]
         .parse::<usize>()
         .expect("Number of scrambles must be a number");
 
-    let number_of_threads = args.get(2).map_or_else(
+    let number_of_threads = args.get(3).map_or_else(
         || {
             std::thread::available_parallelism()
                 .expect("Failed to get number of threads")
@@ -44,7 +47,6 @@ pub fn main() {
 
     let scrambles_per_thread = number_of_scrambles / number_of_threads;
 
-    let solver = solvers::methods::two_phase::Solver::new();
     let method_times = Arc::new(Mutex::new(vec![]));
     let method_lengths = Arc::new(Mutex::new(vec![]));
 
@@ -106,15 +108,6 @@ fn solve_n_scrambles(count: usize, solver: &impl Method) -> (Vec<Duration>, Vec<
         let now = std::time::Instant::now();
         let solution = solver.solve(&cube);
         let elapsed = now.elapsed();
-
-        // println!(
-        //     "Scramble: {}",
-        //     cube::algorithms::algorithm_to_string(&scramble)
-        // );
-        // println!(
-        //     "Solution: {}",
-        //     cube::algorithms::algorithm_to_string(&solution)
-        // );
 
         times.push(elapsed);
         lengths.push(solution.len());
