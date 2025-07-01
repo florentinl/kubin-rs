@@ -22,21 +22,21 @@ pub struct Cubie {
 impl Cubie {
     const VERTEX_POSITIONS: [[f32; 3]; 8] = [
         // Back, Left, Down
-        [-0.5, -0.5, -0.5],
+        [-1.0, -1.0, -1.0],
         // Back, Right, Down
-        [0.5, -0.5, -0.5],
+        [1.0, -1.0, -1.0],
         // Back, Right, Up
-        [0.5, 0.5, -0.5],
+        [1.0, 1.0, -1.0],
         // Back, Left, Up
-        [-0.5, 0.5, -0.5],
+        [-1.0, 1.0, -1.0],
         // Front, Left, Down
-        [-0.5, -0.5, 0.5],
+        [-1.0, -1.0, 1.0],
         // Front, Right, Down
-        [0.5, -0.5, 0.5],
+        [1.0, -1.0, 1.0],
         // Front, Right, Up
-        [0.5, 0.5, 0.5],
+        [1.0, 1.0, 1.0],
         // Front, Left, Up
-        [-0.5, 0.5, 0.5],
+        [-1.0, 1.0, 1.0],
     ];
 
     const FACES: [CubieFace; 6] = [
@@ -82,7 +82,7 @@ impl Cubie {
             for triange in face.triangles.iter() {
                 for &index in triange {
                     let position = Self::VERTEX_POSITIONS[index];
-                    let position = transformation
+                    let position: [f32; 3] = transformation
                         .transform_point(cgmath::Point3::from(position))
                         .into();
 
@@ -119,12 +119,12 @@ impl Cubie {
 
     pub fn is_currently_in_face(&self, face: Faces) -> bool {
         match face {
-            Faces::Front => self.position[2] > 0.1,
-            Faces::Back => self.position[2] < -0.1,
-            Faces::Left => self.position[0] < -0.1,
-            Faces::Right => self.position[0] > 0.1,
-            Faces::Up => self.position[1] > 0.1,
-            Faces::Down => self.position[1] < -0.1,
+            Faces::Front => self.position[2] > 1.,
+            Faces::Back => self.position[2] < -1.,
+            Faces::Left => self.position[0] < -1.,
+            Faces::Right => self.position[0] > 1.,
+            Faces::Up => self.position[1] > 1.,
+            Faces::Down => self.position[1] < -1.,
         }
     }
 
@@ -139,6 +139,23 @@ impl Cubie {
         self.position = transformation
             .transform_point(cgmath::Point3::from(self.position))
             .into();
+
+        queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(&self.vertices));
+    }
+
+    pub fn round_positions(&mut self, queue: &wgpu::Queue) {
+        self.position = [
+            self.position[0].round(),
+            self.position[1].round(),
+            self.position[2].round(),
+        ];
+        for vertex in self.vertices.iter_mut() {
+            vertex.position = [
+                vertex.position[0].round(),
+                vertex.position[1].round(),
+                vertex.position[2].round(),
+            ];
+        }
 
         queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(&self.vertices));
     }

@@ -22,7 +22,6 @@ pub struct Cube {
 impl Cube {
     pub fn new(device: &wgpu::Device) -> Self {
         let mut cubies = Vec::new();
-        let scale = 1.0 / 3.0;
 
         for x in -1..=1 {
             for y in -1..=1 {
@@ -44,11 +43,9 @@ impl Cube {
                         faces.push(Faces::Back);
                     }
 
-                    // Scale down by a factor of 3
                     let offset =
-                        cgmath::Vector3::new(x as f32 * scale, y as f32 * scale, z as f32 * scale);
-                    let transformation = cgmath::Matrix4::from_translation(offset)
-                        * cgmath::Matrix4::from_scale(scale);
+                        cgmath::Vector3::new((2 * x) as f32, (2 * y) as f32, (2 * z) as f32);
+                    let transformation = cgmath::Matrix4::from_translation(offset);
 
                     cubies.push(Cubie::new(device, faces, transformation));
                 }
@@ -70,11 +67,6 @@ impl Cube {
             self.animation_face = Some(face);
             self.animation_progress = 0.0;
             self.animation_direction = direction;
-            log::info!(
-                "Starting animation for face: {} in direction: {:?}",
-                face.to_string(),
-                direction
-            );
         }
     }
 
@@ -84,15 +76,7 @@ impl Cube {
                 (delta_time.as_secs_f32() * self.animation_speed) / (PI / 2.0);
 
             if self.animation_progress >= 1.0 {
-                let theta = -(PI / 2.0)
-                    * (self.animation_progress - 1.0)
-                    * f32::from(&self.animation_direction);
-
-                self.cubies.iter_mut().for_each(|cubie| {
-                    if cubie.is_currently_in_face(animation_face) {
-                        cubie.transform(animation_face.get_transformation(theta), queue);
-                    }
-                });
+                self.round_positions(&queue);
 
                 self.animation_progress = 0.0;
                 // TODO: Clamp the positions of the cubies to ensure they don't slightly change over time
@@ -101,6 +85,7 @@ impl Cube {
                 if let Some((face, direction)) = self.move_queue.pop() {
                     self.start_animation(face, direction);
                 }
+                return;
             }
             let theta = delta_time.as_secs_f32()
                 * self.animation_speed
@@ -112,6 +97,12 @@ impl Cube {
                 }
             });
         }
+    }
+
+    fn round_positions(&mut self, queue: &wgpu::Queue) {
+        self.cubies.iter_mut().for_each(|cubie| {
+            cubie.round_positions(&queue);
+        });
     }
 
     pub fn start_algorithm(&mut self, algorithm: &[Move]) {
@@ -160,6 +151,7 @@ impl Cube {
                 Move::Lp => vec![(Faces::Left, Direction::CounterClockwise)],
                 Move::None => vec![],
             })
+            .rev()
             .collect::<Vec<_>>();
 
         self.move_queue.extend(queue);
@@ -239,7 +231,7 @@ impl Cube {
 
     fn corner_piece_from_position(&self, position: [f32; 3]) -> usize {
         // Convert the position to a corner piece
-        let scale = 1.0 / 3.0;
+        let scale = 2.0;
         let x = (position[0] / scale).round() as i32;
         let y = (position[1] / scale).round() as i32;
         let z = (position[2] / scale).round() as i32;
@@ -307,8 +299,8 @@ impl Cube {
     }
 
     fn edge_piece_from_position(&self, position: [f32; 3]) -> usize {
+        let scale = 2.0;
         // Convert the position to an edge piece
-        let scale = 1.0 / 3.0;
         let x = (position[0] / scale).round() as i32;
         let y = (position[1] / scale).round() as i32;
         let z = (position[2] / scale).round() as i32;

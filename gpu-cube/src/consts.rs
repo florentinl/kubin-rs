@@ -3,7 +3,7 @@ pub const BLUE: [f32; 3] = [0.0, 0.0, 1.0];
 pub const ORANGE: [f32; 3] = [0.8, 0.4, 0.0];
 pub const RED: [f32; 3] = [1.0, 0.0, 0.0];
 pub const WHITE: [f32; 3] = [0.8, 0.8, 0.8];
-pub const YELLOW: [f32; 3] = [1.0, 0.3, 0.0];
+pub const YELLOW: [f32; 3] = [1.0, 1.0, 0.0];
 
 pub const BLACK: [f32; 3] = [0.2, 0.2, 0.2];
 
