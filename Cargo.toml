@@ -1,6 +1,2 @@
 [workspace]
-members = [
-    "solver",
-    "cube",
-    "cube-macros",
-]
+members = ["solver", "cube", "cube-macros", "gpu-cube"]
