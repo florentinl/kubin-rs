@@ -16,7 +16,6 @@ pub struct Cubie {
     pub vertex_buffer: wgpu::Buffer,
     pub vertex_count: u32,
     vertices: Vec<Vertex>,
-    pub faces: Vec<Faces>,
 }
 
 impl Cubie {
@@ -113,7 +112,6 @@ impl Cubie {
             vertices,
             vertex_buffer,
             vertex_count,
-            faces,
         }
     }
 

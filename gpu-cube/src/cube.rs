@@ -1,9 +1,6 @@
 use std::{f32::consts::PI, time::Duration, vec};
 
 use cube::algorithms::Move;
-use cube::corner::Corner;
-use cube::edge::Edge;
-use cube::*;
 
 use crate::{
     consts::{Direction, Faces},
@@ -17,6 +14,7 @@ pub struct Cube {
     pub cubies: Vec<Cubie>,
     animation_direction: Direction,
     move_queue: Vec<(Faces, Direction)>,
+    pub cube: cube::Cube, // Non-graphic representation of the cube
 }
 
 impl Cube {
@@ -59,11 +57,13 @@ impl Cube {
             animation_direction: Direction::Clockwise,
             cubies,
             move_queue: Vec::new(),
+            cube: cube::Cube::default(),
         }
     }
 
     pub fn start_animation(&mut self, face: Faces, direction: Direction) {
         if !self.animation_face.is_some() {
+            self.cube.execute_move(&face.to_move(&direction));
             self.animation_face = Some(face);
             self.animation_progress = 0.0;
             self.animation_direction = direction;
@@ -158,167 +158,6 @@ impl Cube {
 
         if let Some((face, direction)) = self.move_queue.pop() {
             self.start_animation(face, direction);
-        }
-    }
-
-    pub fn to_non_graphic_cube(&self) -> cube::Cube {
-        let mut result = cube::Cube::default();
-
-        // Map each cubie position to the corresponding edge or corner
-        for cubie in &self.cubies {
-            if cubie.faces.len() == 2 {
-                let piece_from_faces = self.edge_piece_from_faces(&cubie.faces);
-                let piece_from_position = self.edge_piece_from_position(cubie.position);
-
-                result.edges[piece_from_position] = Edge {
-                    piece: piece_from_faces,
-                    orientation: 0, // Default orientation
-                };
-            } else if cubie.faces.len() == 3 {
-                // Handle corner pieces
-                let piece_from_faces = self.corner_piece_from_faces(&cubie.faces);
-                let piece_from_position = self.corner_piece_from_position(cubie.position);
-
-                result.corners[piece_from_position] = Corner {
-                    piece: piece_from_faces,
-                    orientation: 0, // Default orientation
-                };
-            }
-        }
-
-        result
-    }
-
-    fn corner_piece_from_faces(&self, faces: &[Faces]) -> cube::corner::Piece {
-        // Convert the faces to a corner piece
-        let mut up = false;
-        let mut down = false;
-        let mut left = false;
-        let mut right = false;
-        let mut front = false;
-        let mut back = false;
-        for face in faces {
-            match face {
-                Faces::Up => up = true,
-                Faces::Down => down = true,
-                Faces::Left => left = true,
-                Faces::Right => right = true,
-                Faces::Front => front = true,
-                Faces::Back => back = true,
-            }
-        }
-
-        if up && front && left {
-            cube::corner::Piece::Ufl
-        } else if up && right && front {
-            cube::corner::Piece::Urf
-        } else if up && back && right {
-            cube::corner::Piece::Ubr
-        } else if up && left && back {
-            cube::corner::Piece::Ulb
-        } else if down && left && front {
-            cube::corner::Piece::Dlf
-        } else if down && front && right {
-            cube::corner::Piece::Dfr
-        } else if down && right && back {
-            cube::corner::Piece::Drb
-        } else if down && back && left {
-            cube::corner::Piece::Dbl
-        } else {
-            panic!("Invalid corner piece configuration")
-        }
-    }
-
-    fn corner_piece_from_position(&self, position: [f32; 3]) -> usize {
-        // Convert the position to a corner piece
-        let scale = 2.0;
-        let x = (position[0] / scale).round() as i32;
-        let y = (position[1] / scale).round() as i32;
-        let z = (position[2] / scale).round() as i32;
-
-        match (x, y, z) {
-            (1, 1, 1) => URF,
-            (1, 1, -1) => UBR,
-            (1, -1, 1) => DFR,
-            (1, -1, -1) => DRB,
-            (-1, 1, 1) => UFL,
-            (-1, 1, -1) => ULB,
-            (-1, -1, 1) => DLF,
-            (-1, -1, -1) => DBL,
-            _ => panic!("Invalid corner piece position"),
-        }
-    }
-
-    fn edge_piece_from_faces(&self, faces: &[Faces]) -> cube::edge::Piece {
-        // Convert the faces to an edge piece
-        let mut up = false;
-        let mut down = false;
-        let mut left = false;
-        let mut right = false;
-        let mut front = false;
-        let mut back = false;
-
-        for face in faces {
-            match face {
-                Faces::Up => up = true,
-                Faces::Down => down = true,
-                Faces::Left => left = true,
-                Faces::Right => right = true,
-                Faces::Front => front = true,
-                Faces::Back => back = true,
-            }
-        }
-
-        if up && front {
-            cube::edge::Piece::UF
-        } else if up && right {
-            cube::edge::Piece::UR
-        } else if up && back {
-            cube::edge::Piece::UB
-        } else if up && left {
-            cube::edge::Piece::UL
-        } else if down && front {
-            cube::edge::Piece::DF
-        } else if down && right {
-            cube::edge::Piece::DR
-        } else if down && back {
-            cube::edge::Piece::DB
-        } else if down && left {
-            cube::edge::Piece::DL
-        } else if front && right {
-            cube::edge::Piece::FR
-        } else if right && back {
-            cube::edge::Piece::BR
-        } else if back && left {
-            cube::edge::Piece::BL
-        } else if left && front {
-            cube::edge::Piece::FL
-        } else {
-            panic!("Invalid edge piece configuration")
-        }
-    }
-
-    fn edge_piece_from_position(&self, position: [f32; 3]) -> usize {
-        let scale = 2.0;
-        // Convert the position to an edge piece
-        let x = (position[0] / scale).round() as i32;
-        let y = (position[1] / scale).round() as i32;
-        let z = (position[2] / scale).round() as i32;
-
-        match (x, y, z) {
-            (1, 1, 0) => UR,
-            (1, 0, 1) => FR,
-            (1, 0, -1) => BR,
-            (1, -1, 0) => DR,
-            (-1, 1, 0) => UL,
-            (-1, 0, 1) => FL,
-            (-1, 0, -1) => BL,
-            (-1, -1, 0) => DL,
-            (0, 1, 1) => UF,
-            (0, 1, -1) => UB,
-            (0, -1, 1) => DF,
-            (0, -1, -1) => DB,
-            _ => panic!("Invalid edge piece position"),
         }
     }
 }

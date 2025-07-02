@@ -282,7 +282,7 @@ impl State {
                         }
                     }
                     winit::keyboard::Key::Named(NamedKey::Enter) => {
-                        let solution = self.solver.solve(&self.cube.to_non_graphic_cube());
+                        let solution = self.solver.solve(&self.cube.cube);
 
                         log::info!("Solution: {:?}", solution);
 

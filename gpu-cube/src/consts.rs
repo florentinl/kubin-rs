@@ -1,3 +1,5 @@
+use cube::algorithms::Move;
+
 pub const GREEN: [f32; 3] = [0.0, 1.0, 0.0];
 pub const BLUE: [f32; 3] = [0.0, 0.0, 1.0];
 pub const ORANGE: [f32; 3] = [0.8, 0.4, 0.0];
@@ -52,6 +54,23 @@ impl Faces {
             Faces::Right => cgmath::Matrix4::from_angle_x(cgmath::Rad(-theta)),
             Faces::Up => cgmath::Matrix4::from_angle_y(cgmath::Rad(-theta)),
             Faces::Down => cgmath::Matrix4::from_angle_y(cgmath::Rad(theta)),
+        }
+    }
+
+    pub fn to_move(&self, direction: &Direction) -> Move {
+        match (self, direction) {
+            (Faces::Front, Direction::Clockwise) => Move::F,
+            (Faces::Front, Direction::CounterClockwise) => Move::Fp,
+            (Faces::Back, Direction::Clockwise) => Move::B,
+            (Faces::Back, Direction::CounterClockwise) => Move::Bp,
+            (Faces::Left, Direction::Clockwise) => Move::L,
+            (Faces::Left, Direction::CounterClockwise) => Move::Lp,
+            (Faces::Right, Direction::Clockwise) => Move::R,
+            (Faces::Right, Direction::CounterClockwise) => Move::Rp,
+            (Faces::Up, Direction::Clockwise) => Move::U,
+            (Faces::Up, Direction::CounterClockwise) => Move::Up,
+            (Faces::Down, Direction::Clockwise) => Move::D,
+            (Faces::Down, Direction::CounterClockwise) => Move::Dp,
         }
     }
 }
