@@ -1,3 +1,5 @@
+use std::{fmt::Display, ops::Mul};
+
 use cube::algorithms::Move;
 
 pub const GREEN: [f32; 3] = [0.0, 1.0, 0.0];
@@ -15,11 +17,13 @@ pub enum Direction {
     CounterClockwise,
 }
 
-impl From<&Direction> for f32 {
-    fn from(direction: &Direction) -> Self {
+impl Mul<Direction> for f32 {
+    type Output = f32;
+
+    fn mul(self, direction: Direction) -> Self::Output {
         match direction {
-            Direction::Clockwise => 1.0,
-            Direction::CounterClockwise => -1.0,
+            Direction::Clockwise => self,
+            Direction::CounterClockwise => -self,
         }
     }
 }
@@ -35,7 +39,7 @@ pub enum Faces {
 }
 
 impl Faces {
-    pub fn color(&self) -> [f32; 3] {
+    pub fn color(self) -> [f32; 3] {
         match self {
             Faces::Front => GREEN,
             Faces::Back => BLUE,
@@ -46,7 +50,7 @@ impl Faces {
         }
     }
 
-    pub fn get_transformation(&self, theta: f32) -> cgmath::Matrix4<f32> {
+    pub fn get_transformation(self, theta: f32) -> cgmath::Matrix4<f32> {
         match self {
             Faces::Front => cgmath::Matrix4::from_angle_z(cgmath::Rad(-theta)),
             Faces::Back => cgmath::Matrix4::from_angle_z(cgmath::Rad(theta)),
@@ -57,7 +61,7 @@ impl Faces {
         }
     }
 
-    pub fn to_move(&self, direction: &Direction) -> Move {
+    pub fn to_move(self, direction: Direction) -> Move {
         match (self, direction) {
             (Faces::Front, Direction::Clockwise) => Move::F,
             (Faces::Front, Direction::CounterClockwise) => Move::Fp,
@@ -75,15 +79,16 @@ impl Faces {
     }
 }
 
-impl ToString for Faces {
-    fn to_string(&self) -> String {
-        match self {
-            Faces::Front => "Front".to_string(),
-            Faces::Back => "Back".to_string(),
-            Faces::Left => "Left".to_string(),
-            Faces::Right => "Right".to_string(),
-            Faces::Up => "Top".to_string(),
-            Faces::Down => "Bottom".to_string(),
-        }
+impl Display for Faces {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let self_str = match self {
+            Faces::Front => "Front",
+            Faces::Back => "Back",
+            Faces::Left => "Left",
+            Faces::Right => "Right",
+            Faces::Up => "Top",
+            Faces::Down => "Bottom",
+        };
+        f.write_str(self_str)
     }
 }

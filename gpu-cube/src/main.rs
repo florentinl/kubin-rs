@@ -19,14 +19,17 @@ pub fn main() -> anyhow::Result<()> {
         return Err(anyhow::anyhow!("Solver argument is required"));
     }
 
-    let solver = from_method_name(&args[1])
-        .expect("The solver must be one of cfop|free_fop|one_phase|two_phase");
+    let solver = from_method_name(&args[1]);
+    match solver {
+        Ok(solver) => {
+            env_logger::init();
 
-    env_logger::init();
+            let event_loop = EventLoop::with_user_event().build()?;
+            let mut app = App::new(solver);
+            event_loop.run_app(&mut app)?;
 
-    let event_loop = EventLoop::with_user_event().build()?;
-    let mut app = App::new(solver);
-    event_loop.run_app(&mut app)?;
-
-    Ok(())
+            Ok(())
+        }
+        Err(msg) => Err(anyhow::anyhow!(msg)),
+    }
 }

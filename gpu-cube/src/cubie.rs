@@ -1,4 +1,4 @@
-use cgmath::Transform as _;
+use cgmath::{Transform as _, num_traits::ToPrimitive};
 use wgpu::util::DeviceExt;
 
 use crate::{
@@ -73,12 +73,12 @@ impl Cubie {
 
     pub fn new(
         device: &wgpu::Device,
-        faces: Vec<Faces>,
+        faces: &[Faces],
         transformation: cgmath::Matrix4<f32>,
     ) -> Self {
         let mut vertices = Vec::new();
-        for face in Self::FACES.iter() {
-            for triange in face.triangles.iter() {
+        for face in &Self::FACES {
+            for triange in &face.triangles {
                 for &index in triange {
                     let position = Self::VERTEX_POSITIONS[index];
                     let position: [f32; 3] = transformation
@@ -96,12 +96,12 @@ impl Cubie {
         }
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-            label: Some(&format!("Cubie Vertex Buffer",)),
+            label: Some("Cubie Vertex Buffer"),
             contents: bytemuck::cast_slice(&vertices),
             usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
         });
 
-        let vertex_count = vertices.len() as u32;
+        let vertex_count = vertices.len().to_u32().unwrap_or(u32::MAX);
 
         let position = transformation
             .transform_point(cgmath::Point3::from([0.0, 0.0, 0.0]))
@@ -109,9 +109,9 @@ impl Cubie {
 
         Cubie {
             position,
-            vertices,
             vertex_buffer,
             vertex_count,
+            vertices,
         }
     }
 
@@ -127,7 +127,7 @@ impl Cubie {
     }
 
     pub fn transform(&mut self, transformation: cgmath::Matrix4<f32>, queue: &wgpu::Queue) {
-        for vertex in self.vertices.iter_mut() {
+        for vertex in &mut self.vertices {
             let position: [f32; 3] = transformation
                 .transform_point(cgmath::Point3::from(vertex.position))
                 .into();
@@ -147,7 +147,7 @@ impl Cubie {
             self.position[1].round(),
             self.position[2].round(),
         ];
-        for vertex in self.vertices.iter_mut() {
+        for vertex in &mut self.vertices {
             vertex.position = [
                 vertex.position[0].round(),
                 vertex.position[1].round(),

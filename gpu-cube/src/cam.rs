@@ -1,3 +1,4 @@
+use cgmath::{Point3, Vector3};
 use wgpu::util::DeviceExt as _;
 use winit::{
     dpi::PhysicalSize,
@@ -14,9 +15,9 @@ pub const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::from_co
 );
 
 pub struct Camera {
-    eye: cgmath::Point3<f32>,
-    target: cgmath::Point3<f32>,
-    up: cgmath::Vector3<f32>,
+    eye: Point3<f32>,
+    target: Point3<f32>,
+    up: Vector3<f32>,
     aspect: f32,
     fovy: f32,
     znear: f32,
@@ -71,7 +72,7 @@ impl Camera {
         let mut camera = Self {
             eye: (0.0, 1.0, 2.0).into(),
             target: (0.0, 0.0, 0.0).into(),
-            up: cgmath::Vector3::unit_y(),
+            up: Vector3::unit_y(),
             aspect: size.width as f32 / size.height as f32,
             fovy: 45.0,
             znear: 0.1,
@@ -98,7 +99,7 @@ impl Camera {
         let view = cgmath::Matrix4::look_at_rh(self.eye, self.target, self.up);
         let proj = cgmath::perspective(cgmath::Deg(self.fovy), self.aspect, self.znear, self.zfar);
 
-        return OPENGL_TO_WGPU_MATRIX * proj * view;
+        OPENGL_TO_WGPU_MATRIX * proj * view
     }
 
     fn update_view_proj(&mut self) {

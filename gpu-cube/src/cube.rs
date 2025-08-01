@@ -14,16 +14,27 @@ pub struct Cube {
     pub cubies: Vec<Cubie>,
     animation_direction: Direction,
     move_queue: Vec<(Faces, Direction)>,
-    pub cube: cube::Cube, // Non-graphic representation of the cube
+    pub algebric_representation: cube::Cube, // Non-graphic representation of the cube
+    previous_eased_progress: f32,            // Track previous eased progress for delta calculations
 }
 
 impl Cube {
+    /// Cubic ease-in-out easing function
+    /// Provides smooth acceleration at the start and deceleration at the end
+    fn cubic_ease_in_out(t: f32) -> f32 {
+        if t < 0.5 {
+            4.0 * t * t * t
+        } else {
+            1.0 - (-2.0 * t + 2.0).powi(3) / 2.0
+        }
+    }
+
     pub fn new(device: &wgpu::Device) -> Self {
         let mut cubies = Vec::new();
 
-        for x in -1..=1 {
-            for y in -1..=1 {
-                for z in -1..=1 {
+        for x in -1i16..=1 {
+            for y in -1i16..=1 {
+                for z in -1i16..=1 {
                     let mut faces = vec![];
                     if x == 1 {
                         faces.push(Faces::Right);
@@ -42,10 +53,10 @@ impl Cube {
                     }
 
                     let offset =
-                        cgmath::Vector3::new((2 * x) as f32, (2 * y) as f32, (2 * z) as f32);
+                        cgmath::Vector3::new(f32::from(2 * x), f32::from(2 * y), f32::from(2 * z));
                     let transformation = cgmath::Matrix4::from_translation(offset);
 
-                    cubies.push(Cubie::new(device, faces, transformation));
+                    cubies.push(Cubie::new(device, &faces, transformation));
                 }
             }
         }
@@ -57,15 +68,18 @@ impl Cube {
             animation_direction: Direction::Clockwise,
             cubies,
             move_queue: Vec::new(),
-            cube: cube::Cube::default(),
+            algebric_representation: cube::Cube::default(),
+            previous_eased_progress: 0.0,
         }
     }
 
     pub fn start_animation(&mut self, face: Faces, direction: Direction) {
-        if !self.animation_face.is_some() {
-            self.cube.execute_move(&face.to_move(&direction));
+        if self.animation_face.is_none() {
+            self.algebric_representation
+                .execute_move(&face.to_move(direction));
             self.animation_face = Some(face);
             self.animation_progress = 0.0;
+            self.previous_eased_progress = 0.0;
             self.animation_direction = direction;
         }
     }
@@ -76,10 +90,10 @@ impl Cube {
                 (delta_time.as_secs_f32() * self.animation_speed) / (PI / 2.0);
 
             if self.animation_progress >= 1.0 {
-                self.round_positions(&queue);
+                self.round_positions(queue);
 
                 self.animation_progress = 0.0;
-                // TODO: Clamp the positions of the cubies to ensure they don't slightly change over time
+                self.previous_eased_progress = 0.0;
                 self.animation_face = None;
 
                 if let Some((face, direction)) = self.move_queue.pop() {
@@ -87,13 +101,17 @@ impl Cube {
                 }
                 return;
             }
-            let theta = delta_time.as_secs_f32()
-                * self.animation_speed
-                * f32::from(&self.animation_direction);
+
+            let eased_progress = Self::cubic_ease_in_out(self.animation_progress);
+            let delta_eased_progress = eased_progress - self.previous_eased_progress;
+            self.previous_eased_progress = eased_progress;
+
+            let target_angle = (PI / 2.0) * self.animation_direction;
+            let delta_angle = target_angle * delta_eased_progress;
 
             self.cubies.iter_mut().for_each(|cubie| {
                 if cubie.is_currently_in_face(animation_face) {
-                    cubie.transform(animation_face.get_transformation(theta), queue);
+                    cubie.transform(animation_face.get_transformation(delta_angle), queue);
                 }
             });
         }
@@ -101,7 +119,7 @@ impl Cube {
 
     fn round_positions(&mut self, queue: &wgpu::Queue) {
         self.cubies.iter_mut().for_each(|cubie| {
-            cubie.round_positions(&queue);
+            cubie.round_positions(queue);
         });
     }
 

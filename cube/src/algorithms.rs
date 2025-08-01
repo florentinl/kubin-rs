@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
@@ -76,29 +78,29 @@ impl Move {
     }
 }
 
-impl ToString for Move {
-    fn to_string(&self) -> String {
-        match self {
-            Move::U => "U".to_string(),
-            Move::U2 => "U2".to_string(),
-            Move::Up => "U'".to_string(),
-            Move::D => "D".to_string(),
-            Move::D2 => "D2".to_string(),
-            Move::Dp => "D'".to_string(),
-            Move::F => "F".to_string(),
-            Move::F2 => "F2".to_string(),
-            Move::Fp => "F'".to_string(),
-            Move::B => "B".to_string(),
-            Move::B2 => "B2".to_string(),
-            Move::Bp => "B'".to_string(),
-            Move::R => "R".to_string(),
-            Move::R2 => "R2".to_string(),
-            Move::Rp => "R'".to_string(),
-            Move::L => "L".to_string(),
-            Move::L2 => "L2".to_string(),
-            Move::Lp => "L'".to_string(),
-            Move::None => String::new(),
-        }
+impl Display for Move {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            Move::U => "U",
+            Move::U2 => "U2",
+            Move::Up => "U'",
+            Move::D => "D",
+            Move::D2 => "D2",
+            Move::Dp => "D'",
+            Move::F => "F",
+            Move::F2 => "F2",
+            Move::Fp => "F'",
+            Move::B => "B",
+            Move::B2 => "B2",
+            Move::Bp => "B'",
+            Move::R => "R",
+            Move::R2 => "R2",
+            Move::Rp => "R'",
+            Move::L => "L",
+            Move::L2 => "L2",
+            Move::Lp => "L'",
+            Move::None => "",
+        })
     }
 }
 

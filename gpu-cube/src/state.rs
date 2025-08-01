@@ -140,13 +140,10 @@ impl State {
             queue,
             config,
             is_surface_configured: false,
-
             cube,
             camera,
             depth_texture,
-
             render_pipeline,
-
             last_frame: std::time::Instant::now(),
             window,
             solver,
@@ -222,7 +219,7 @@ impl State {
             render_pass.set_pipeline(&self.render_pipeline);
             render_pass.set_bind_group(0, &self.camera.camera_bind_group, &[]);
 
-            for cubie in self.cube.cubies.iter() {
+            for cubie in &self.cube.cubies {
                 render_pass.set_vertex_buffer(0, cubie.vertex_buffer.slice(..));
                 render_pass.draw(0..cubie.vertex_count, 0..1);
             }
@@ -250,7 +247,7 @@ impl State {
                         self.resize(size.width, size.height);
                     }
                     Err(e) => {
-                        log::error!("Unable to render {}", e);
+                        log::error!("Unable to render {e}");
                     }
                 }
             }
@@ -282,9 +279,9 @@ impl State {
                         }
                     }
                     winit::keyboard::Key::Named(NamedKey::Enter) => {
-                        let solution = self.solver.solve(&self.cube.cube);
+                        let solution = self.solver.solve(&self.cube.algebric_representation);
 
-                        log::info!("Solution: {:?}", solution);
+                        log::info!("Solution: {solution:?}");
 
                         self.cube.start_algorithm(&solution);
                     }

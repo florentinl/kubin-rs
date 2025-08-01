@@ -5,13 +5,13 @@ pub mod free_fop;
 pub mod one_phase;
 pub mod two_phase;
 
-pub fn from_method_name(name: &str) -> Result<Methods, ()> {
+pub fn from_method_name(name: &str) -> Result<Methods, &'static str> {
     match name {
         "cfop" => Ok(Methods::Cfop(cfop::Solver::new())),
         "free_fop" => Ok(Methods::FreeFop(free_fop::Solver::new())),
         "one_phase" => Ok(Methods::OnePhase(one_phase::Solver::new())),
         "two_phase" => Ok(Methods::TwoPhase(two_phase::Solver::new())),
-        _ => Err(()),
+        _ => Err("Unknown method"),
     }
 }
 
